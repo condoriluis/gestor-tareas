@@ -1,8 +1,9 @@
 'use client';
 
 import { useDrop } from 'react-dnd';
-import TaskCard from './TaskCard';
 import { useEffect, useState } from 'react';
+import { showToast } from "@/utils/toastMessages";
+import TaskCard from './TaskCard';
 import AddTask from './AddTask';
 
 type Task = { id: number; title: string; description: string; status: string };
@@ -16,14 +17,12 @@ const TaskBoard = () => {
   const fetchTasks = async () => {
     try {
       const response = await fetch('/api/tasks');
-      if (!response.ok) {
-        throw new Error(`Error al obtener tareas: ${response.statusText}`);
-      }
+      if (!response.ok) throw new Error('Error al obtener tareas');
       const data = await response.json();
       setTasks(data);
     } catch (error) {
       setError('No se pudieron cargar las tareas');
-      console.error(error);
+      showToast('Error al cargar la tarea', 'error');
     } finally {
       setLoading(false);
     }
@@ -42,14 +41,14 @@ const TaskBoard = () => {
       });
 
       const data = await response.json();
-      if (!response.ok || !data.id) {
-        throw new Error('El servidor no devolvió una tarea válida.');
-      }
+      if (!response.ok || !data.id) throw new Error('Error en la creación');
 
       setTasks((prevTasks) => [data, ...prevTasks]);
       setIsAddTask(false);
+      showToast('Tarea agregada exitosamente', 'success');
+
     } catch (error) {
-      console.error('Error en handleAddTask:', error);
+      showToast('No se pudo agregar la tarea', 'error');
     }
   };
 
@@ -61,17 +60,17 @@ const TaskBoard = () => {
         body: JSON.stringify({ title, description, status }),
       });
   
-      if (!response.ok) {
-        throw new Error("No se pudo actualizar la tarea.");
-      }
+      if (!response.ok) throw new Error('Error al editar tarea');
   
       const updatedTask = await response.json();
   
       setTasks((prevTasks) =>
         prevTasks.map((task) => (task.id === id ? updatedTask : task))
       );
+      showToast('Tarea editado exitosamente', 'success');
+
     } catch (error) {
-      console.error("Error en handleUpdateTask:", error);
+      showToast('No se pudo editar la tarea', 'error');
     }
   };
 
@@ -82,13 +81,13 @@ const TaskBoard = () => {
         headers: { "Content-Type": "application/json" },
       });
   
-      if (!response.ok) {
-        throw new Error("No se pudo eliminar la tarea.");
-      }
+      if (!response.ok) throw new Error('Error al editar tarea');
   
       setTasks((prevTasks) => prevTasks.filter((task) => task.id !== id));
+      showToast('Tarea eliminado exitosamente', 'success')
+
     } catch (error) {
-      console.error("Error al eliminar tarea:", error);
+      showToast('No se pudo eliminar la tarea', 'error');
     }
   };
   
@@ -104,13 +103,14 @@ const TaskBoard = () => {
 
   return (
     <div ref={drop as unknown as React.RefObject<HTMLDivElement>} className="min-h-screen p-8 bg-gray-100">
+
       {loading ? (
         <p className="text-center text-gray-500">Cargando tareas...</p>
       ) : error ? (
         <p className="text-center text-red-500">{error}</p>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {/* Agregar tarea */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+  
           {isAddTask ? (
             <AddTask onAddTask={handleAddTask} onCancel={() => setIsAddTask(false)} />
           ) : (
@@ -120,7 +120,6 @@ const TaskBoard = () => {
             </div>
           )}
 
-          {/* Mostrar tareas */}
           {tasks.length > 0 ? (
             tasks.map((task) => (
               <TaskCard key={task.id} task={task} onUpdate={handleUpdateTask} onDelete={() => {handleDeleteTask(task.id)}} />

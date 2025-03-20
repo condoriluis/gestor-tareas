@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { MdOutlineSave, MdClose } from "react-icons/md";
+import { showToast } from "@/utils/toastMessages";
 
 interface EditTaskProps {
   title: string;
@@ -18,23 +20,22 @@ const EditTask: React.FC<EditTaskProps> = ({
   const [title, setTitle] = useState(initialTitle);
   const [description, setDescription] = useState(initialDescription);
   const [status, setStatus] = useState(initialStatus);
-  const [error, setError] = useState<string | null>(null);
 
   const handleSave = () => {
     if (!title.trim()) {
-      setError("El título no puede estar vacío.");
+      showToast('El título no puede estar vacío.', 'error');
       return;
     }
     if (!description.trim()) {
-      setError("La descripción no puede estar vacía.");
+      showToast('La descripción no puede estar vacía.', 'error');
       return;
     }
 
-    setError(null);
     onSave(title, description, status);
   };
 
   return (
+    
     <div>
       <input
         type="text"
@@ -58,21 +59,23 @@ const EditTask: React.FC<EditTaskProps> = ({
         <option value="in_progress">En progreso</option>
         <option value="done">Completada</option>
       </select>
-
-      {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
-
-      <button
-        className="bg-teal-500 text-white px-4 py-2 rounded mr-2"
-        onClick={handleSave}
-      >
-        Guardar
-      </button>
-      <button
-        onClick={onCancel}
-        className="bg-red-500 text-white px-4 py-2 rounded"
-      >
-        Cancelar
-      </button>
+      <hr className="border border-dashed mt-2"/>
+      <div className="flex space-x-4"> 
+        <button
+          onClick={handleSave}
+          className="text-teal-500 hover:text-teal-600 transition duration-300 cursor-pointer"
+          aria-label="Guardar cambios"
+        >
+          <MdOutlineSave size={24} />
+        </button>
+        <button
+          onClick={onCancel}
+          className="text-red-500 hover:text-red-600 transition duration-300 cursor-pointer"
+          aria-label="Cancelar"
+        >
+          <MdClose size={24} />
+        </button>
+      </div>
     </div>
   );
 };

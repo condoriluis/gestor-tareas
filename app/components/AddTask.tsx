@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { MdClose, MdOutlineSave } from 'react-icons/md';
+import { showToast } from "@/utils/toastMessages";
 
 type Task = { id: number; title: string; description: string; status: string };
 
@@ -15,19 +17,17 @@ const AddTask: React.FC<AddTaskProps> = ({ onAddTask, onCancel }) => {
     status: 'pending',
   });
 
-  const [validationError, setValidationError] = useState<string | null>(null);
-
   const handleAdd = () => {
     if (!newTask.title.trim()) {
-      setValidationError('El título es obligatorio.');
+      showToast('El título es obligatorio.', 'error');
       return;
     }
     if (!newTask.description.trim()) {
-      setValidationError('La descripción es obligatoria.');
+      showToast('La descripción es obligatoria.', 'error');
       return;
     }
     if (!newTask.status) {
-      setValidationError('El estado de la tarea es obligatorio.');
+      showToast('El estado de la tarea es obligatorio.', 'error');
       return;
     }
 
@@ -61,19 +61,24 @@ const AddTask: React.FC<AddTaskProps> = ({ onAddTask, onCancel }) => {
         <option value="in_progress">En progreso</option>
         <option value="done">Completada</option>
       </select>
-      {validationError && <p className="text-red-500 text-sm">{validationError}</p>}
-      <button
-        className="text-white bg-teal-500 hover:bg-teal-600 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
-        onClick={handleAdd}
-      >
-        Guardar
-      </button>
-      <button
-        onClick={onCancel}
-        className="text-white bg-red-500 hover:bg-red-600 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
-      >
-        Cancelar
-      </button>
+      <hr className="border border-dashed mt-2"/>
+     
+      <div className="flex space-x-4"> 
+        <button
+          onClick={handleAdd}
+          className="text-teal-500 hover:text-teal-600 transition duration-300 cursor-pointer"
+          aria-label="Guardar"
+        >
+          <MdOutlineSave size={24} />
+        </button>
+        <button
+          onClick={onCancel}
+          className="text-red-500 hover:text-red-600 transition duration-300 cursor-pointer"
+          aria-label="Cancelar"
+        >
+          <MdClose size={24} />
+        </button>
+      </div>
     </div>
   );
 };
