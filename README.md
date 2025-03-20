@@ -44,7 +44,6 @@ Para instalar y ejecutar este proyecto en tu máquina local, sigue estos pasos:
 4. Configura tu archivo .env.local: En la raíz del proyecto, crea un archivo .env.local si no existe. Este archivo debe contener las siguientes variables de entorno para configurar la conexión a la base de datos:
 
    ```bash
-   Editar
    DB_HOST=localhost
    DB_USER=tu_usuario_mysql
    DB_PASSWORD=tu_contraseña_mysql
@@ -54,11 +53,9 @@ Para instalar y ejecutar este proyecto en tu máquina local, sigue estos pasos:
 
 5. Configuración de la Base de Datos
 
-### Primero, crea la base de datos `task_manager`.
-
-    ```sql
-    CREATE DATABASE task_manager;
-    ```
+   ```sql
+   CREATE DATABASE task_manager;
+   ```
 
 6. Crea la tabla tasks:
 
