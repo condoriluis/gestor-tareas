@@ -64,6 +64,7 @@ Para instalar y ejecutar este proyecto en tu máquina local, sigue estos pasos:
        id INT AUTO_INCREMENT PRIMARY KEY,
        title VARCHAR(255) NOT NULL,
        description TEXT NOT NULL,
+       priority VARCHAR(10) NOT NULL,
        status ENUM('pending', 'in_progress', 'done') NOT NULL DEFAULT 'pending',
        position INT NOT NULL DEFAULT 0,
        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
