@@ -16,11 +16,11 @@ export const GET = async () => {
 // Agregar una nueva tarea (POST)
 export const POST = async (req: Request) => {
   try {
-    const { title, description, status } = await req.json();
+    const { title, description, priority, status } = await req.json();
 
-    validateTaskData({ title, description, status });
-
-    const newTaskId = await createTask(title, description, status);
+    validateTaskData({ title, description, priority, status });
+   
+    const newTaskId = await createTask(title, description, priority, status);
 
     const newTask = await getTaskById(newTaskId);
 

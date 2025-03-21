@@ -1,10 +1,10 @@
 import { query } from '../../../utils/db';
 import { Task } from './types';
 
-export const createTask = async (title: string, description: string, status: string): Promise<number> => {
+export const createTask = async (title: string, description: string, priority: string, status: string): Promise<number> => {
   const result = await query<{ insertId: number }>(
-    'INSERT INTO tasks (title, description, status, position) VALUES (?, ?, ?, ?)',
-    [title, description, status, 1]
+    'INSERT INTO tasks (title, description, priority, status, position) VALUES (?, ?, ?, ?, ?)',
+    [title, description, priority, status, 1]
   );
 
 
@@ -26,11 +26,11 @@ export const getTaskById = async (id: number): Promise<Task[] | null> => {
   return result.length > 0 ? result[0] : null;
 };
 
-export const updateTask = async (id: number, title: string, description: string, status: string): Promise<boolean> => {
+export const updateTask = async (id: number, title: string, description: string, priority: string): Promise<boolean> => {
 
   const result = await query(
-    'UPDATE tasks SET title = ?, description = ?, status = ? WHERE id = ?', 
-    [title, description, status, id]
+    'UPDATE tasks SET title = ?, description = ?, priority = ? WHERE id = ?', 
+    [title, description, priority, id]
   );
 
   return result.length > 0;

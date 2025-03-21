@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import EditTask from "./EditTask";
 import { MdCheckCircle, MdCancel, MdEdit, MdDelete } from "react-icons/md";
+import { FaCircle } from "react-icons/fa";
 
-type Task = { id: number; title: string; description: string; status: string };
+type Task = { id: number; title: string; description: string; priority: string; status: string; };
 
 interface TaskCardProps {
   task: Task;
-  onUpdate: (id: number, title: string, description: string, status: string) => void;
+  onUpdate: (id: number, title: string, description: string, priority: string) => void;
   onDelete: (id: number) => void;
 }
 
@@ -20,53 +21,89 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onUpdate, onDelete }) => {
   };
 
   return (
-    <div className="bg-white p-4 rounded shadow-lg">
+    <div className="bg-[#343434] p-4 rounded shadow-lg">
       {editMode ? (
         <EditTask
           title={task.title}
           description={task.description}
-          status={task.status}
-          onSave={(title, description, status) => {
-            onUpdate(task.id, title, description, status);
+          priority={task.priority}
+          onSave={(title, description, priority) => {
+            onUpdate(task.id, title, description, priority);
             setEditMode(false);
           }}
           onCancel={() => setEditMode(false)}
         />
       ) : (
         <div>
-          <h3 className="text-lg font-semibold text-gray-800">{task.title}</h3>
+          <h3 className="text-lg font-semibold text-[#00E57B]">{task.title}</h3>
           <p className="text-gray-600">{task.description}</p>
-          <div className="flex items-center space-x-2">
-            <span className="text-sm text-gray-500">Estado:</span>
-            
+          <div className="flex items-center space-x-2 mb-2">
+            <span className="text-sm text-gray-500">Prioridad:</span>
+
             <span
-              className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold ${
-                task.status === "pending"
-                  ? "bg-yellow-200 text-yellow-800"
-                  : task.status === "in_progress"
-                  ? "bg-blue-200 text-blue-800"
-                  : task.status === "done"
-                  ? "bg-green-200 text-green-800"
-                  : "bg-gray-200 text-gray-800"
+              className={`inline-flex items-center px-3 py-1 rounded-lg text-sm font-semibold shadow-md ${
+                task.priority === "low"
+                  ? "bg-green-100 text-green-700"
+                  : task.priority === "medium"
+                  ? "bg-yellow-100 text-yellow-700"
+                  : task.priority === "high"
+                  ? "bg-red-100 text-red-700"
+                  : "bg-gray-200 text-gray-700"
               }`}
             >
-              {
-                task.status === "pending"
-                  ? "Pendiente"
-                  : task.status === "in_progress"
-                  ? "En Progreso"
-                  : task.status === "done"
-                  ? "Completada"
-                  : "Sin especificar"
-              }
+              <FaCircle
+                className={`mr-2 ${
+                  task.priority === "low"
+                    ? "text-green-500"
+                    : task.priority === "medium"
+                    ? "text-yellow-500"
+                    : task.priority === "high"
+                    ? "text-red-500"
+                    : "text-gray-400"
+                }`}
+                size={12}
+              />
+              {task.priority === "low"
+                ? "Baja"
+                : task.priority === "medium"
+                ? "Media"
+                : task.priority === "high"
+                ? "Alta"
+                : "Sin especificar"}
             </span>
           </div>
-            <hr className="border border-dashed mt-2"/>
+
+          <div className="flex items-center space-x-2">
+            <span className="text-sm text-gray-500">Estado:</span>
+
+            <span
+              className={`inline-flex items-center px-3 py-1 rounded-md text-sm font-semibold ${
+                task.status === "pending"
+                  ? "bg-yellow-100 text-yellow-600"
+                  : task.status === "in_progress"
+                  ? "bg-blue-100 text-blue-600"
+                  : task.status === "done"
+                  ? "bg-green-100 text-green-600"
+                  : "bg-gray-100 text-gray-600"
+              }`}
+            >
+              {task.status === "pending"
+                ? "Pendiente"
+                : task.status === "in_progress"
+                ? "En Progreso"
+                : task.status === "done"
+                ? "Completada"
+                : "Sin especificar"}
+            </span>
+          </div>
+
+          <hr className="border border-dashed mt-3 mb-3"/>
+          
           <div className="flex space-x-4">
         
             <button
               onClick={() => setEditMode(true)}
-              className="text-teal-500 hover:text-teal-600 transition duration-300 cursor-pointer"
+              className="text-[#00E57B] hover:text-teal-600 transition duration-300 cursor-pointer"
               aria-label="Editar tarea"
             >
               <MdEdit size={24} />

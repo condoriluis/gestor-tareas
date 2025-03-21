@@ -42,13 +42,13 @@ export const PUT = async (req: Request, { params }: { params: { id: number } }) 
         return NextResponse.json({ message: 'Error en el formato del cuerpo de la solicitud' }, { status: 400 });
       }
   
-      const { title, description, status } = body;
+      const { title, description, priority, status } = body;
   
-      if (!title || !description || !status) {
+      if (!title || !description || !priority) {
         return NextResponse.json({ message: 'Todos los campos son obligatorios' }, { status: 400 });
       }
   
-      const updatedRows = await updateTask(id, title, description, status);
+      const updatedRows = await updateTask(id, title, description, priority);
       const putTask = await getTaskById(id);
 
       if (updatedRows) {

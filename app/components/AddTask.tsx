@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { MdClose, MdOutlineSave } from 'react-icons/md';
 import { showToast } from "@/utils/toastMessages";
 
-type Task = { id: number; title: string; description: string; status: string };
+type Task = { id: number; title: string; description: string; priority: string; status: string };
 
 interface AddTaskProps {
   onAddTask: (task: Task) => void;
@@ -14,6 +14,7 @@ const AddTask: React.FC<AddTaskProps> = ({ onAddTask, onCancel }) => {
     id: 0,
     title: '',
     description: '',
+    priority: 'low',
     status: 'pending',
   });
 
@@ -32,48 +33,78 @@ const AddTask: React.FC<AddTaskProps> = ({ onAddTask, onCancel }) => {
     }
 
     onAddTask(newTask);
-    setNewTask({ id: 0, title: '', description: '', status: 'pending' });
+    setNewTask({ id: 0, title: '', description: '', priority: 'low', status: 'pending' });
   };
 
   return (
-    <div className="bg-white border-2 border-dashed border-teal-300 p-4 rounded shadow-lg">
+    <div className="bg-[#00E57B] text-white p-4 rounded shadow-lg">
       <input
         type="text"
-        className="w-full text-gray-800 p-0 mb-0 rounded focus:outline-none focus:ring focus:ring-teal-400"
+        className="w-full p-1 mb-3 rounded focus:outline-none focus:ring focus:ring-white"
         placeholder="Título"
         autoFocus
         value={newTask.title}
-        onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
+        onChange={(e) =>
+          setNewTask({
+            ...newTask,
+            title: e.target.value
+              .toLowerCase()
+              .split(" ")
+              .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+              .join(" "),
+          })
+        }
       />
       <input
         type="text"
-        className="w-full text-gray-800 p-0 mb-0 rounded focus:outline-none focus:ring focus:ring-teal-400"
+        className="w-full p-1 mb-3 rounded focus:outline-none focus:ring focus:ring-white"
         placeholder="Descripción"
         value={newTask.description}
-        onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
+        onChange={(e) => 
+          setNewTask({ 
+            ...newTask, 
+            description: e.target.value.charAt(0).toUpperCase() + e.target.value.slice(1).toLowerCase(), 
+          })
+        }
       />
-      <select
-        className="w-full text-gray-800 p-0 mb-2 rounded focus:outline-none focus:ring focus:ring-teal-400"
-        value={newTask.status}
-        onChange={(e) => setNewTask({ ...newTask, status: e.target.value })}
-      >
-        <option value="pending">Pendiente</option>
-        <option value="in_progress">En progreso</option>
-        <option value="done">Completada</option>
-      </select>
-      <hr className="border border-dashed mt-2"/>
+      <div className="flex gap-2 text-sm mb-3">
+        {[
+          { value: "low", label: "Baja", color: "bg-green-500" },
+          { value: "medium", label: "Media", color: "bg-yellow-500" },
+          { value: "high", label: "Alta", color: "bg-red-500" },
+        ].map(({ value, label, color }) => (
+          <label
+            key={value}
+            className={`cursor-pointer p-1 py-1 rounded flex items-center gap-2 border border-1 border-white ${
+              newTask.priority === value ? `${color} text-white` : "bg-gray-200 text-gray-800"
+            }`}
+          >
+            <input
+              type="radio"
+              name="priority"
+              value={value}
+              checked={newTask.priority === value}
+              onChange={(e) => setNewTask({ ...newTask, priority: e.target.value })}
+              className="hidden"
+            />
+            {label}
+          </label>
+        ))}
+      </div>
+
+      <hr className="border border-dashed mb-2"/>
      
       <div className="flex space-x-4"> 
         <button
           onClick={handleAdd}
-          className="text-teal-500 hover:text-teal-600 transition duration-300 cursor-pointer"
+          className="text-white hover:text-teal-600 transition duration-300 cursor-pointer"
           aria-label="Guardar"
         >
           <MdOutlineSave size={24} />
         </button>
         <button
           onClick={onCancel}
-          className="text-red-500 hover:text-red-600 transition duration-300 cursor-pointer"
+          className="text-white hover:text-red-600 transition duration-300 cursor-pointer"
           aria-label="Cancelar"
         >
           <MdClose size={24} />

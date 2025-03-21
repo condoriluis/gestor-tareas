@@ -6,7 +6,7 @@ import { showToast } from "@/utils/toastMessages";
 import TaskCard from './TaskCard';
 import AddTask from './AddTask';
 
-type Task = { id: number; title: string; description: string; status: string };
+type Task = { id: number; title: string; description: string; priority: string; status: string; };
 
 const TaskBoard = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -52,12 +52,12 @@ const TaskBoard = () => {
     }
   };
 
-  const handleUpdateTask = async (id: number, title: string, description: string, status: string) => {
+  const handleUpdateTask = async (id: number, title: string, description: string, priority: string) => {
     try {
       const response = await fetch(`/api/tasks/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, description, status }),
+        body: JSON.stringify({ title, description, priority }),
       });
   
       if (!response.ok) throw new Error('Error al editar tarea');
@@ -102,19 +102,21 @@ const TaskBoard = () => {
   }));
 
   return (
-    <div ref={drop as unknown as React.RefObject<HTMLDivElement>} className="min-h-screen p-8 bg-gray-100">
+    <div ref={drop as unknown as React.RefObject<HTMLDivElement>} className="min-h-screen p-8 bg-[#1E1E1E]">
 
       {loading ? (
         <p className="text-center text-gray-500">Cargando tareas...</p>
       ) : error ? (
         <p className="text-center text-red-500">{error}</p>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        <>
+        <h1 className="text-white text-center mb-6 text-xs">Mis Tareas</h1>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
   
           {isAddTask ? (
             <AddTask onAddTask={handleAddTask} onCancel={() => setIsAddTask(false)} />
           ) : (
-            <div className="bg-white border-2 border-dashed border-teal-300 p-4 rounded shadow-lg text-center text-gray-500 cursor-pointer" onClick={() => setIsAddTask(true)}>
+            <div className="bg-[#343434] border-2 border-dashed border-[#00E57B] p-4 rounded shadow-lg text-center text-white cursor-pointer" onClick={() => setIsAddTask(true)}>
               <h3 className="text-lg font-bold">+ Nueva Tarea</h3>
               <p>Haz clic para agregar</p>
             </div>
@@ -128,6 +130,7 @@ const TaskBoard = () => {
             <p className="text-center text-gray-500">No hay tareas disponibles</p>
           )}
         </div>
+        </>
       )}
     </div>
   );
