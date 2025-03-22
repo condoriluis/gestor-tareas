@@ -15,7 +15,7 @@ const AddTask: React.FC<AddTaskProps> = ({ onAddTask, onCancel }) => {
     title: '',
     description: '',
     priority: 'low',
-    status: 'pending',
+    status: 'todo',
   });
 
   const handleAdd = () => {
@@ -33,7 +33,7 @@ const AddTask: React.FC<AddTaskProps> = ({ onAddTask, onCancel }) => {
     }
 
     onAddTask(newTask);
-    setNewTask({ id: 0, title: '', description: '', priority: 'low', status: 'pending' });
+    setNewTask({ id: 0, title: '', description: '', priority: 'low', status: 'todo' });
   };
 
   return (

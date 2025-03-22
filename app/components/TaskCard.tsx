@@ -78,7 +78,9 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onUpdate, onDelete }) => {
 
             <span
               className={`inline-flex items-center px-3 py-1 rounded-md text-sm font-semibold ${
-                task.status === "pending"
+                task.status === "todo"
+                  ? "bg-gray-100 text-gray-600"
+                  : task.status === "pending"
                   ? "bg-yellow-100 text-yellow-600"
                   : task.status === "in_progress"
                   ? "bg-blue-100 text-blue-600"
@@ -87,12 +89,14 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onUpdate, onDelete }) => {
                   : "bg-gray-100 text-gray-600"
               }`}
             >
-              {task.status === "pending"
+              {task.status === "todo"
+                ? "To-do"
+                : task.status === "pending"
                 ? "Pendiente"
                 : task.status === "in_progress"
                 ? "En Progreso"
                 : task.status === "done"
-                ? "Completada"
+                ? "Completado"
                 : "Sin especificar"}
             </span>
           </div>

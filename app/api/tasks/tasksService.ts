@@ -36,6 +36,16 @@ export const updateTask = async (id: number, title: string, description: string,
   return result.length > 0;
 };
 
+export const updateTaskStatus = async (id: number, status: string): Promise<boolean> => {
+
+  const result = await query(
+    'UPDATE tasks SET status = ? WHERE id = ?', 
+    [status, id]
+  );
+
+  return result.length > 0;
+};
+
 export const deleteTask = async (id: number): Promise<boolean> => {
   const results = await query('DELETE FROM tasks WHERE id = ?', [id]);
 
