@@ -89,7 +89,8 @@ const EditTask: React.FC<EditTaskProps> = ({
         ))}
       </div>
 
-      <hr className="border border-dashed mb-2"/>
+      <hr className="border border-dashed border-gray-400 mb-2"/>
+
       <div className="flex space-x-4"> 
         <button
           onClick={handleSave}

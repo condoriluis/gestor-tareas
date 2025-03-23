@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getTaskById, updateTask, updateTaskStatus, deleteTask } from '../tasksService';
 
-// Obtener una tarea por ID (GET /api/tasks/:id)
+// Obtener una tarea por ID (GET /api/tasks/[id])
 export async function GET(req: Request, context: { params: { id: string } }) {
   try {
     const { id } = context.params;
@@ -18,49 +18,67 @@ export async function GET(req: Request, context: { params: { id: string } }) {
 
     return NextResponse.json(task, { status: 200 });
   } catch (error) {
-    console.error('Error al obtener tarea:', error);
     return NextResponse.json({ message: 'Error interno del servidor' }, { status: 500 });
   }
 }
 
-// Actualizar una tarea por ID (PUT /api/tasks/[id])
+// Actualizar una tarea (PUT /api/tasks/[id])
 export const PUT = async (req: Request, { params }: { params: { id: number } }) => {
-    try {
+  try {
+    const resolvedParams = await params;
+    const id = resolvedParams?.id;
 
-      const resolvedParams = await params;
-      const id = resolvedParams?.id;
-  
-      if (!id) {
-        return NextResponse.json({ message: 'ID de tarea es necesario' }, { status: 400 });
-      }
-  
-      let body;
-      try {
-        body = await req.json();
-   
-      } catch (error) {
-        return NextResponse.json({ message: 'Error en el formato del cuerpo de la solicitud' }, { status: 400 });
-      }
-  
-      const { title, description, priority, status } = body;
-  
+    if (!id) {
+      return NextResponse.json({ message: 'ID de tarea es necesario' }, { status: 400 });
+    }
+
+    let body;
+    try {
+      body = await req.json();
+    } catch (error) {
+      return NextResponse.json({ message: 'Error en el formato del cuerpo de la solicitud' }, { status: 400 });
+    }
+
+    const { type } = body;
+
+    if (!type) {
+      return NextResponse.json({ message: 'El campo type es obligatorio' }, { status: 400 });
+    }
+
+    let updatedRows = 0;
+
+    if (type === 'edit') {
+      const { title, description, priority } = body;
+      
       if (!title || !description || !priority) {
         return NextResponse.json({ message: 'Todos los campos son obligatorios' }, { status: 400 });
       }
-  
-      const updatedRows = await updateTask(id, title, description, priority);
-      const putTask = await getTaskById(id);
 
-      if (updatedRows) {
-        return NextResponse.json({ message: 'Tarea no encontrada' }, { status: 404 });
+      updatedRows = await updateTask(id, title, description, priority);
+    } 
+    else if (type === 'status') {
+      const { status } = body;
+
+      if (!status) {
+        return NextResponse.json({ message: 'El campo status es obligatorio' }, { status: 400 });
       }
-  
-      return NextResponse.json(putTask, { status: 200 })
-  
-    } catch (error) {
-      console.error('Error al actualizar tarea:', error);
-      return NextResponse.json({ message: 'Error interno del servidor' }, { status: 500 });
+
+      updatedRows = await updateTaskStatus(id, status);
+    } 
+    else {
+      return NextResponse.json({ message: 'Tipo de operación inválido' }, { status: 400 });
     }
+
+    if (updatedRows === 0) {
+      return NextResponse.json({ message: 'Tarea no encontrada o sin cambios' }, { status: 404 });
+    }
+
+    const updatedTask = await getTaskById(id);
+    return NextResponse.json(updatedTask, { status: 200 });
+
+  } catch (error) {
+    return NextResponse.json({ message: 'Error interno del servidor' }, { status: 500 });
+  }
 };
 
 // Eliminar una tarea (DELETE /api/tasks/[id])
@@ -82,47 +100,6 @@ export const DELETE = async (req: Request, { params }: { params: { id: number } 
 
     return NextResponse.json({ message: 'Tarea eliminada correctamente' }, { status: 200 });
   } catch (error) {
-   
     return NextResponse.json({ message: 'Error interno del servidor' }, { status: 500 });
   }
 }
-
-// Actualizar el estado de una tarea (PUT /api/tasks/[id]/status)
-export const PUT_STATUS = async (req: Request, { params }: { params: { id: number } }) => {
-  try {
-    const resolvedParams = await params;
-    const id = resolvedParams?.id;
-
-    if (!id) {
-      return NextResponse.json({ message: 'ID de tarea es necesario' }, { status: 400 });
-    }
-
-    let body;
-    try {
-      body = await req.json();
-    } catch (error) {
-      return NextResponse.json({ message: 'Error en el formato del cuerpo de la solicitud' }, { status: 400 });
-    }
-
-    const { status } = body;
-
-    if (!status) {
-      return NextResponse.json({ message: 'El campo de estado es obligatorio' }, { status: 400 });
-    }
-
-    // Llama a la función que actualiza solo el estado de la tarea
-    const updatedRows = await updateTaskStatus(id, status);
-
-    if (updatedRows) {
-      return NextResponse.json({ message: 'Tarea no encontrada' }, { status: 404 });
-    }
-
-    // Obtener la tarea actualizada para devolverla
-    const updatedTask = await getTaskById(id);
-
-    return NextResponse.json(updatedTask, { status: 200 });
-  } catch (error) {
-    console.error('Error al actualizar estado de tarea:', error);
-    return NextResponse.json({ message: 'Error interno del servidor' }, { status: 500 });
-  }
-};

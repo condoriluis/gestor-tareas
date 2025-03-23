@@ -21,7 +21,6 @@ export const POST = async (req: Request) => {
     validateTaskData({ title, description, priority, status });
    
     const newTaskId = await createTask(title, description, priority, status);
-
     const newTask = await getTaskById(newTaskId);
 
     if (!newTask) {
@@ -30,7 +29,6 @@ export const POST = async (req: Request) => {
 
     return NextResponse.json(newTask, { status: 201 });
   } catch (error) {
-    console.error('Error en el POST de /api/tasks:', error);
     return NextResponse.json({ message: 'Error al crear tarea' }, { status: 500 });
   }
 };

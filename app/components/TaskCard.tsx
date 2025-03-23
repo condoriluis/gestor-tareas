@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
+import { useDrag } from 'react-dnd';
 import EditTask from "./EditTask";
+import { Task } from '@/utils/types'
+import { formatDate } from '@/utils/dateFormat';
 import { MdCheckCircle, MdCancel, MdEdit, MdDelete } from "react-icons/md";
 import { FaCircle } from "react-icons/fa";
-
-type Task = { id: number; title: string; description: string; priority: string; status: string; };
 
 interface TaskCardProps {
   task: Task;
@@ -15,13 +16,29 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onUpdate, onDelete }) => {
   const [editMode, setEditMode] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
+  const [{ isDragging }, drag] = useDrag(() => ({
+    type: "TASK",
+    item: { id: task.id },
+    collect: (monitor) => ({
+      isDragging: monitor.isDragging(),
+    }),
+  }));
+
+  const ref = useRef<HTMLDivElement | null>(null);
+  drag(ref);
+
   const handleDeleteConfirm = () => {
     onDelete(task.id);
     setShowDeleteModal(false);
   };
 
   return (
-    <div className="bg-[#343434] p-4 rounded shadow-lg">
+    <div
+      ref={ref}
+      className={`p-4 bg-[#343434] text-white rounded-lg shadow-lg cursor-grab ${
+        isDragging ? "opacity-25 border border-[#00E57B] border-dotted" : ""
+      }`}
+    >
       {editMode ? (
         <EditTask
           title={task.title}
@@ -101,7 +118,12 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onUpdate, onDelete }) => {
             </span>
           </div>
 
-          <hr className="border border-dashed mt-3 mb-3"/>
+          <div className="flex items-center space-x-2 mt-1 text-sm">
+            <span className="text-gray-500 font-medium">Creado el:</span>
+            <p className="text-gray-700 font-semibold">{formatDate(task.created_at)}</p>
+          </div>
+
+          <hr className="border border-dashed border-gray-400 mt-1 mb-3"/>
           
           <div className="flex space-x-4">
         

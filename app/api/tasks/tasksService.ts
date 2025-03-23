@@ -1,5 +1,5 @@
-import { query } from '../../../utils/db';
-import { Task } from './types';
+import { query } from '@/utils/db';
+import { Task } from '@/utils/types'
 
 export const createTask = async (title: string, description: string, priority: string, status: string): Promise<number> => {
   const result = await query<{ insertId: number }>(
@@ -26,31 +26,27 @@ export const getTaskById = async (id: number): Promise<Task[] | null> => {
   return result.length > 0 ? result[0] : null;
 };
 
-export const updateTask = async (id: number, title: string, description: string, priority: string): Promise<boolean> => {
-
-  const result = await query(
+export const updateTask = async (id: number, title: string, description: string, priority: string): Promise<number> => {
+  const result = await query<{ affectedRows: number }>(
     'UPDATE tasks SET title = ?, description = ?, priority = ? WHERE id = ?', 
     [title, description, priority, id]
   );
 
-  return result.length > 0;
+  return result.length;
 };
 
-export const updateTaskStatus = async (id: number, status: string): Promise<boolean> => {
+export const updateTaskStatus = async (id: number, status: string): Promise<number> => {
 
-  const result = await query(
+  const result = await query<{ affectedRows: number }>(
     'UPDATE tasks SET status = ? WHERE id = ?', 
     [status, id]
   );
 
-  return result.length > 0;
+  return result.length;
 };
 
-export const deleteTask = async (id: number): Promise<boolean> => {
-  const results = await query('DELETE FROM tasks WHERE id = ?', [id]);
+export const deleteTask = async (id: number): Promise<number> => {
+  const results = await query<{ affectedRows: number }>('DELETE FROM tasks WHERE id = ?', [id]);
 
-  const affectedRows = results.length > 0;
-
-  return affectedRows;
+  return results.length;
 };
-

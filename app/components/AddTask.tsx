@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { MdClose, MdOutlineSave } from 'react-icons/md';
 import { showToast } from "@/utils/toastMessages";
-
-type Task = { id: number; title: string; description: string; priority: string; status: string };
+import { Task } from '@/utils/types'
 
 interface AddTaskProps {
   onAddTask: (task: Task) => void;
@@ -16,6 +15,7 @@ const AddTask: React.FC<AddTaskProps> = ({ onAddTask, onCancel }) => {
     description: '',
     priority: 'low',
     status: 'todo',
+    created_at: ''
   });
 
   const handleAdd = () => {
@@ -33,7 +33,7 @@ const AddTask: React.FC<AddTaskProps> = ({ onAddTask, onCancel }) => {
     }
 
     onAddTask(newTask);
-    setNewTask({ id: 0, title: '', description: '', priority: 'low', status: 'todo' });
+    setNewTask({ id: 0, title: '', description: '', priority: 'low', status: 'todo', created_at: '' });
   };
 
   return (
