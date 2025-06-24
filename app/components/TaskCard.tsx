@@ -3,7 +3,7 @@ import { useDrag } from 'react-dnd';
 import EditTask from "./EditTask";
 import { Task } from '@/utils/types'
 import { formatDate } from '@/utils/dateFormat';
-import { MdCheckCircle, MdCancel, MdEdit, MdDelete } from "react-icons/md";
+import { MdCheckCircle, MdCancel, MdEdit, MdDelete, MdClose } from "react-icons/md";
 import { FaCircle } from "react-icons/fa";
 
 interface TaskCardProps {
@@ -111,7 +111,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onUpdate, onDelete }) => {
                 : task.status === "pending"
                 ? "Pendiente"
                 : task.status === "in_progress"
-                ? "En Progreso"
+                ? "En progreso"
                 : task.status === "done"
                 ? "Completado"
                 : "Sin especificar"}
@@ -145,27 +145,36 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onUpdate, onDelete }) => {
           </div>
 
           {showDeleteModal && (
-            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30">
-              <div className="bg-white p-6 rounded-lg shadow-lg w-80">
-                <h4 className="text-xl font-semibold text-center text-gray-700 mb-4">
-                  <MdCancel className="inline-block text-red-500 mr-2" />
+            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+              <div className="bg-[#2A2A2A] p-6 rounded-lg shadow-lg w-80">
+                <div className="flex justify-between items-center mb-4">
+                  <h4 className="text-xl font-bold text-white">
+                    <MdCancel className="inline-block text-red-500 mr-2" />
+                    Confirmar eliminación
+                  </h4>
+                  <button 
+                    onClick={() => setShowDeleteModal(false)}
+                    className="text-gray-400 hover:text-white"
+                  >
+                    <MdClose size={24} />
+                  </button>
+                </div>
+                
+                <p className="text-gray-300 mb-6">
                   ¿Estás seguro de eliminar la tarea "{task.title}"?
-                </h4>
-                <div className="flex justify-between">
+                </p>
+                
+                <div className="flex justify-end gap-2">
                   <button
                     onClick={() => setShowDeleteModal(false)}
-                    className="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400 transition duration-300"
-                    aria-label="Cancelar"
+                    className="px-4 py-2 rounded bg-[#343434] text-gray-300 hover:bg-[#404040]"
                   >
-                    <MdCheckCircle className="inline-block text-gray-600 mr-2" />
                     Cancelar
                   </button>
                   <button
                     onClick={handleDeleteConfirm}
-                    className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition duration-300"
-                    aria-label="Confirmar eliminación"
+                    className="px-4 py-2 rounded bg-red-500 text-white hover:bg-red-600"
                   >
-                    <MdCheckCircle className="inline-block text-white mr-2" />
                     Eliminar
                   </button>
                 </div>

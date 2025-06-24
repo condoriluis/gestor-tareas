@@ -11,7 +11,7 @@ const TaskBoard = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [, setLoading] = useState<boolean>(true);
   const [, setError] = useState<string | null>(null);
-  const [isAddTask, setIsAddTask] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const fetchTasks = async () => {
     try {
@@ -43,7 +43,7 @@ const TaskBoard = () => {
       if (!response.ok || !data.id) throw new Error('Error en la creación');
 
       setTasks((prevTasks) => [data, ...prevTasks]);
-      setIsAddTask(false);
+      setIsModalOpen(false);
       showToast('Tarea agregada exitosamente', 'success');
 
     } catch (error) {
@@ -120,56 +120,68 @@ const TaskBoard = () => {
   };
 
   const statuses = [
-    { key: "todo", label: "To-Do", color: "border-gray-500" },
+    { key: "todo", label: "To-do", color: "border-gray-500" },
     { key: "pending", label: "Pendientes", color: "border-yellow-500" },
-    { key: "in_progress", label: "En Progreso", color: "border-blue-500" },
+    { key: "in_progress", label: "En progreso", color: "border-blue-500" },
     { key: "done", label: "Completado", color: "border-green-500" },
   ];
 
   return (
     <>
-    <div className="min-h-screen p-8 bg-[#1E1E1E]">
-      <h1 className="text-white text-center mb-3 text-xl font-bold">Mis Tareas</h1>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {statuses.map(({ key, label, color }) => {
-          const [, drop] = useDrop(() => ({
-            accept: "TASK",
-            drop: (item: Task) => moveTask(item.id, key),
-          }));
+      <div className="min-h-screen p-8 bg-[#1E1E1E] relative">
+        <h1 className="text-white text-center mb-3 text-xl font-bold">Mis tareas</h1>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {statuses.map(({ key, label, color }) => {
+            const [, drop] = useDrop(() => ({
+              accept: "TASK",
+              drop: (item: Task) => moveTask(item.id, key),
+            }));
 
-          const ref = useRef<HTMLDivElement | null>(null);
-          drop(ref);
+            const ref = useRef<HTMLDivElement | null>(null);
+            drop(ref);
 
-          return (
-            <div
-              key={key}
-              ref={ref}
-              className={`bg-[#2A2A2A] p-4 rounded-lg border-2 ${color} shadow-lg`}
-            >
-              <h2 className="text-lg font-semibold text-white text-center mb-4">{label}</h2>
-              <div className="space-y-3">
-                {key === 'todo' && isAddTask ? (
-                  <AddTask onAddTask={handleAddTask} onCancel={() => setIsAddTask(false)} />
-                ) : key === 'todo' && !isAddTask ? (
-                  <div className="bg-[#343434] border-2 border-dashed border-[#00E57B] p-4 rounded shadow-lg text-center text-white cursor-pointer" onClick={() => setIsAddTask(true)}>
-                    <h3 className="text-lg font-bold">+ Nueva Tarea</h3>
-                    <p>Haz clic para agregar</p>
-                  </div>
-                ) : null}
-                
-                {tasks.filter(task => task.status === key).map(task => (
-                  <TaskCard key={task.id} task={task} onUpdate={handleUpdateTask} onDelete={() => handleDeleteTask(task.id)} />
-                ))}
+            return (
+              <div
+                key={key}
+                ref={ref}
+                className={`bg-[#2A2A2A] p-4 rounded-lg border-2 ${color} shadow-lg`}
+              >
+                <h2 className="text-lg font-semibold text-white text-center mb-4">{label}</h2>
+                <div className="space-y-3">
+                  {tasks.filter(task => task.status === key).map(task => (
+                    <TaskCard key={task.id} task={task} onUpdate={handleUpdateTask} onDelete={() => handleDeleteTask(task.id)} />
+                  ))}
 
-                {tasks.filter(task => task.status === key).length === 0 && (
-                  <p className="text-center text-gray-400">Sin tareas</p>
-                )}
+                  {tasks.filter(task => task.status === key).length === 0 && (
+                    <p className="text-center text-gray-400">Sin tareas</p>
+                  )}
+                </div>
               </div>
+            );
+          })}
+        </div>
+
+        <button 
+          onClick={() => setIsModalOpen(true)}
+          className="fixed bottom-8 right-8 bg-[#00E57B] text-white p-4 rounded-full shadow-lg hover:bg-[#00C96B] transition-colors cursor-pointer"
+        >
+          <span className="text-2xl font-bold">+</span>
+        </button>
+
+        {isModalOpen && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-[#2A2A2A] p-6 rounded-lg max-w-md w-full">
+              <AddTask 
+                onAddTask={(task) => {
+                  handleAddTask(task);
+                  setIsModalOpen(false);
+                }} 
+                onCancel={() => setIsModalOpen(false)} 
+              />
             </div>
-          );
-        })}
+          </div>
+        )}
       </div>
-    </div>
     </>
   );
 };

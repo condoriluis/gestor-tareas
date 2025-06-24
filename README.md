@@ -65,8 +65,7 @@ Para instalar y ejecutar este proyecto en tu máquina local, sigue estos pasos:
        title VARCHAR(255) NOT NULL,
        description TEXT NOT NULL,
        priority VARCHAR(10) NOT NULL,
-       status ENUM('todo', 'pending', 'in_progress', 'done') NOT NULL DEFAULT 'pending',
-       position INT NOT NULL DEFAULT 1,
+       status ENUM('todo', 'pending', 'in_progress', 'done') NOT NULL DEFAULT 'todo',
        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
        updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
    );
@@ -86,7 +85,7 @@ Para instalar y ejecutar este proyecto en tu máquina local, sigue estos pasos:
 
 ## Uso
 
-- **Agregar tareas**: Usa la interfaz para agregar nuevas tareas.
+- **Agregar tareas**: Usa el boton + en la interfaz para agregar nuevas tareas.
 - **Editar tareas**: Haz clic en el ícono de editar para modificar una tarea existente.
 - **Eliminar tareas**: Haz clic en el ícono de eliminar para confirmar la eliminación de una tarea mediante un modal de confirmación.
-- **Filtrar por estado**: Las tareas pueden tener un estado que se muestra con un badge de color.
+- **Filtrar por estado**: Las tareas pueden tener un estado que se muestra con un badge de colores.
