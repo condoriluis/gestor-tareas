@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ToastContainer } from 'react-toastify';
+import { AuthProvider } from "./context/AuthContext";
+import { TaskUserProvider } from "./context/TaskUserContext";
 import 'react-toastify/dist/ReactToastify.css';
 import "./globals.css";
 
@@ -16,7 +18,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Gestor de tareas",
-  description: "Desarrollado con Next.js, React, Typescript",
+  description: "Desarrollado con Next.js, React, Typescript, Tailwind CSS, MySQL, JWT",
 };
 
 export default function RootLayout({
@@ -29,9 +31,12 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ToastContainer />
-        
-        {children}
+        <AuthProvider>
+          <TaskUserProvider>
+            <ToastContainer />
+            {children}
+          </TaskUserProvider>
+        </AuthProvider>
       </body>
     </html>
   );

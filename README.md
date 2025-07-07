@@ -1,91 +1,117 @@
 # Gestor de Tareas
 
-Este es un proyecto de **gestión de tareas** desarrollado con **Next.js**, **React** y **TypeScript**. La aplicación permite a los usuarios agregar, editar, eliminar y visualizar tareas de forma eficiente y con un diseño intuitivo. Ideal para mantener el seguimiento de tareas personales o de trabajo.
+> Este es un proyecto de **gestor de tareas** desarrollado con **Next.js**, **React** y **TypeScript**. La aplicación permite a los usuarios agregar, editar, eliminar y visualizar tareas de forma eficiente y con un diseño intuitivo. Ideal para mantener el seguimiento de tareas personales o de trabajo.
 
-## Características
+## 🚀 Demo en Vivo
+[Ver demostración](https://player.vimeo.com/video/1099463374)
 
-- **Gestión de tareas**: Añadir, editar y eliminar tareas.
-- **Estado de las tareas**: Visualización del estado de las tareas con colores indicadores (Ej: Pendiente, Completada).
-- **Interfaz de usuario interactiva**: Uso de modales para confirmar la eliminación de tareas.
-- **Diseño minimalista y profesional**: Basado en principios UI/UX con iconos y badges.
-- **Desarrollado con TypeScript**: Beneficios del tipado estático y control de tipos en el desarrollo.
+## ✨ Características Clave
 
-## Tecnologías utilizadas
+### 🖥 Interfaz de Usuario
+- Filtros avanzados
+- Modales contextuales
+- Animaciones fluidas
 
-- **Next.js**: Framework React con optimización de renderizado y enrutamiento.
-- **React**: Biblioteca para construir interfaces de usuario interactivas.
-- **TypeScript**: Superset de JavaScript para un desarrollo más robusto con tipado estático.
-- **Tailwind CSS**: Framework de diseño que facilita el desarrollo con clases utilitarias.
-- **React Icons**: Para añadir iconos en la interfaz de usuario.
-- **MySQL**: Para almacenar datos de tareas.
+### 🔐 Autenticación
+- Login/Registro seguro
+- Roles (Admin/Usuario)
+- Recuperación de contraseña
 
-## Instalación
+### 📱 Responsive Design
+- Mobile-first
+- Adaptable a tablets
+- Touch-friendly
 
-Para instalar y ejecutar este proyecto en tu máquina local, sigue estos pasos:
+## 📸 Galería
 
-1. Clona el repositorio:
+| Sección | Captura |
+|---------|---------|
+| **Login** | ![Login](https://res.cloudinary.com/dpyrrgou3/image/upload/v1751913315/9d89028d576b87_w0qy9d.jpg) |
+| **Registro** | ![Registro](https://res.cloudinary.com/dpyrrgou3/image/upload/v1751913679/c8bf3519231917_qta5gf.jpg) |
+| **Gestión de Tareas** | ![Tareas](https://res.cloudinary.com/dpyrrgou3/image/upload/v1751913450/3019540f51057d_r402vw.jpg) |
+| **Reportes** | ![Reportes](https://res.cloudinary.com/dpyrrgou3/image/upload/v1751913679/196c1287cfbe9b_umtuv3.jpg) |
 
-   ```bash
-   git clone https://github.com/condoriluis/gestor-tareas.git
-   ```
+## 🛠 Stack Tecnológico
 
-2. Navega a la carpeta del proyecto:
+### Frontend
+- Next.js 15
+- React 19
+- TypeScript 5.0
+- Tailwind CSS 4.0
 
-   ```bash
-   cd gestor-tareas
-   ```
+### Backend
+- Next.js API Routes
+- MySQL 8.0
+- JWT Authentication
 
-3. Instala las dependencias:
+## 🚀 Cómo Empezar
 
-   ```bash
-   npm install
-   ```
+### Requisitos
+- Node.js 18+
+- MySQL 8.0+
 
-4. Configura tu archivo .env.local: En la raíz del proyecto, crea un archivo .env.local si no existe. Este archivo debe contener las siguientes variables de entorno para configurar la conexión a la base de datos:
+### Crea la tabla users:
 
-   ```bash
-   DB_HOST=localhost
-   DB_USER=tu_usuario_mysql
-   DB_PASSWORD=tu_contraseña_mysql
-   DB_NAME=task_manager
-   DB_PORT=3306
-   ```
+    ```sql
+    CREATE TABLE users (
+        id_user INT AUTO_INCREMENT PRIMARY KEY,
+        email_user VARCHAR(255) NOT NULL,
+        password_user VARCHAR(255) NOT NULL,
+        name_user VARCHAR(255) DEFAULT NULL,
+        status_user INT DEFAULT NULL,
+        rol_user VARCHAR(20) DEFAULT NULL,
+        date_created_user timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        date_updated_user timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    );
+    ```
+### Crea la tabla tasks:
 
-5. Configuración de la Base de Datos
+    ```sql
+    CREATE TABLE tasks (
+        id_task INT AUTO_INCREMENT PRIMARY KEY,
+        id_user_task INT NOT NULL,
+        title_task VARCHAR(60) NOT NULL,
+        description_task VARCHAR(125) DEFAULT NULL,
+        priority_task VARCHAR(8) NOT NULL,
+        status_task VARCHAR(20) NOT NULL DEFAULT 'todo',
+        date_start_task DATETIME DEFAULT NULL,
+        date_completed_task DATETIME DEFAULT NULL,
+        date_created_task timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        date_updated_task timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    );
+    ```
+    ### Crea la tabla task_history:
 
-   ```sql
-   CREATE DATABASE task_manager;
-   ```
+    ```sql
+    CREATE TABLE task_history (
+        id_history INT AUTO_INCREMENT PRIMARY KEY,
+        id_task_history INT NOT NULL,
+        id_user_history INT NOT NULL,
+        old_status_history VARCHAR(30) DEFAULT NULL,
+        new_status_history VARCHAR(30) DEFAULT NULL,
+        action_history VARCHAR(50) DEFAULT NULL,
+        description_history TEXT DEFAULT NULL,
+        date_created_history timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        date_updated_history timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    );
+    ```
 
-6. Crea la tabla tasks:
+### Instalación
+```bash
+# Clonar repositorio
+git clone https://github.com/condoriluis/gestor-tareas.git
 
-   ```sql
-   CREATE TABLE tasks (
-       id INT AUTO_INCREMENT PRIMARY KEY,
-       title VARCHAR(255) NOT NULL,
-       description TEXT NOT NULL,
-       priority VARCHAR(10) NOT NULL,
-       status ENUM('todo', 'pending', 'in_progress', 'done') NOT NULL DEFAULT 'todo',
-       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-       updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-   );
-   ```
+# Instalar dependencias
+cd gestor-tareas && npm install
 
-7. Ejecuta el proyecto:
+# Configurar entorno
+cp .env.example .env.local
 
-   ```bash
-   npm run dev
-   ```
+# Iniciar aplicación
+npm run dev
+```
 
-8. Abre el navegador y accede a la aplicación en:
+## 📄 Licencia
+MIT © [Luis Alberto](https://github.com/condoriluis)
 
-   ```bash
-   http://localhost:3000
-   ```
-
-## Uso
-
-- **Agregar tareas**: Usa el boton + en la interfaz para agregar nuevas tareas.
-- **Editar tareas**: Haz clic en el ícono de editar para modificar una tarea existente.
-- **Eliminar tareas**: Haz clic en el ícono de eliminar para confirmar la eliminación de una tarea mediante un modal de confirmación.
-- **Filtrar por estado**: Las tareas pueden tener un estado que se muestra con un badge de colores.
+---

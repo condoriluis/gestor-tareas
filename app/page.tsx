@@ -1,15 +1,13 @@
 'use client';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
-import { DndProvider } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
-import TaskBoard from './components/TaskBoard';
+export default function Page() {
+  const router = useRouter();
+  
+  useEffect(() => {
+    router.push('/task');
+  }, [router]);
 
-const App = () => {
-  return (
-    <DndProvider backend={HTML5Backend}>
-      <TaskBoard />
-    </DndProvider>
-  );
+  return null;
 };
-
-export default App;

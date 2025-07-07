@@ -1,34 +1,24 @@
 import { NextResponse } from 'next/server';
-import { createTask, getAllTasks, getTaskById } from './tasksService';
-import { validateTaskData } from './taskValidator';
+import { validateToken } from '@/utils/validateToken';
+import { TaskService } from './TaskService';
 
-// Obtener todas las tareas (GET)
-export const GET = async () => {
+export async function GET(request: Request) {
+
+  const session = await validateToken();
+  
+  if (!session) {
+    return NextResponse.json({ error: 'No autorizado.' }, { status: 401 });
+  }
+
   try {
-    const tasks = await getAllTasks();
+
+    const tasks = await TaskService.getAllTasks(session.id_user);
     return NextResponse.json(tasks, { status: 200 });
-
+    
   } catch (error) {
-    return NextResponse.json({ message: 'Error al obtener tareas' }, { status: 500 });
+    return NextResponse.json(
+      { message: 'Error al obtener tareas' }, 
+      { status: 500 }
+    );
   }
-};
-
-// Agregar una nueva tarea (POST)
-export const POST = async (req: Request) => {
-  try {
-    const { title, description, priority, status } = await req.json();
-
-    validateTaskData({ title, description, priority, status });
-   
-    const newTaskId = await createTask(title, description, priority, status);
-    const newTask = await getTaskById(newTaskId);
-
-    if (!newTask) {
-      throw new Error('Error: No se encontró la tarea recién creada');
-    }
-
-    return NextResponse.json(newTask, { status: 201 });
-  } catch (error) {
-    return NextResponse.json({ message: 'Error al crear tarea' }, { status: 500 });
-  }
-};
+}

@@ -1,8 +1,25 @@
 export interface Task {
-  id: number;
-  title: string;
-  description: string;
-  priority: string;
-  status: string;
-  created_at: string;
+  id_task: number;
+  id_user_task: number;
+  user_name: string;
+  title_task: string;
+  description_task: string;
+  priority_task: string;
+  status_task: string;
+  date_start_task: string;
+  date_completed_task: string;
+  date_created_task: string;
+}
+
+export interface TaskHistory {
+  id_history: number;
+  id_task_history: number;
+  id_user_history: number;
+  user_name: string;
+  old_status_history: string;
+  new_status_history: string;
+  action_history: string;
+  description_history: string;
+  date_created_history: string;
+  date_updated_history: string;
 }

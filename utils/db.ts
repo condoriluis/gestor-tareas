@@ -14,15 +14,16 @@ const pool = mysql.createPool({
   queueLimit: 0,
 });
 
+export async function connectDB() {
+  return await pool.getConnection();
+}
+
 export const query = async <T>(queryString: string, values?: any[]): Promise<T[]> => {
   const connection = await pool.getConnection();
   try {
     const [results] = await connection.query(queryString, values);
-    
     return results as T[];
   } finally {
     connection.release();
   }
 };
-
-export default pool;
