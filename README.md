@@ -52,7 +52,7 @@
 
 ### Crea la tabla users:
 
-    ```sql
+```sql
     CREATE TABLE users (
         id_user INT AUTO_INCREMENT PRIMARY KEY,
         email_user VARCHAR(255) NOT NULL,
@@ -63,38 +63,38 @@
         date_created_user timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
         date_updated_user timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     );
-    ```
+```
 ### Crea la tabla tasks:
 
-    ```sql
-    CREATE TABLE tasks (
-        id_task INT AUTO_INCREMENT PRIMARY KEY,
-        id_user_task INT NOT NULL,
-        title_task VARCHAR(60) NOT NULL,
-        description_task VARCHAR(125) DEFAULT NULL,
-        priority_task VARCHAR(8) NOT NULL,
-        status_task VARCHAR(20) NOT NULL DEFAULT 'todo',
-        date_start_task DATETIME DEFAULT NULL,
-        date_completed_task DATETIME DEFAULT NULL,
-        date_created_task timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        date_updated_task timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-    );
-    ```
-    ### Crea la tabla task_history:
+```sql
+CREATE TABLE tasks (
+    id_task INT AUTO_INCREMENT PRIMARY KEY,
+    id_user_task INT NOT NULL,
+    title_task VARCHAR(60) NOT NULL,
+    description_task VARCHAR(125) DEFAULT NULL,
+    priority_task VARCHAR(8) NOT NULL,
+    status_task VARCHAR(20) NOT NULL DEFAULT 'todo',
+    date_start_task DATETIME DEFAULT NULL,
+    date_completed_task DATETIME DEFAULT NULL,
+    date_created_task timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    date_updated_task timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+```
+### Crea la tabla task_history:
 
-    ```sql
-    CREATE TABLE task_history (
-        id_history INT AUTO_INCREMENT PRIMARY KEY,
-        id_task_history INT NOT NULL,
-        id_user_history INT NOT NULL,
-        old_status_history VARCHAR(30) DEFAULT NULL,
-        new_status_history VARCHAR(30) DEFAULT NULL,
-        action_history VARCHAR(50) DEFAULT NULL,
-        description_history TEXT DEFAULT NULL,
-        date_created_history timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        date_updated_history timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-    );
-    ```
+```sql
+CREATE TABLE task_history (
+    id_history INT AUTO_INCREMENT PRIMARY KEY,
+    id_task_history INT NOT NULL,
+    id_user_history INT NOT NULL,
+    old_status_history VARCHAR(30) DEFAULT NULL,
+    new_status_history VARCHAR(30) DEFAULT NULL,
+    action_history VARCHAR(50) DEFAULT NULL,
+    description_history TEXT DEFAULT NULL,
+    date_created_history timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    date_updated_history timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+```
 
 ### Instalación
 ```bash
