@@ -251,11 +251,11 @@ export default function Historial({ user }: HistorialProps) {
                     <div className="flex justify-center">
                       <button
                         onClick={() => handleDeleteConfirmation()}
-                        className="px-3 py-1 text-sm rounded-full bg-red-400 text-white hover:bg-red-500 transition-all flex items-center gap-1 cursor-pointer"
+                        className="px-3 py-1 text-sm rounded-full bg-red-500 text-white hover:bg-red-600 transition-all flex items-center gap-1 cursor-pointer"
                         title="Eliminar todo el historial"
                       >
                         <FiDelete size={14} />
-                        Limpiar todo el historial
+                        Limpiar el historial
                       </button>
                     </div>
                   )}
