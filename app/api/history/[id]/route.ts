@@ -1,8 +1,8 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { validateToken } from '@/utils/validateToken'
 import { TaskHistoryService } from '../../tasks/TaskHistoryService';
 
-export const GET = async (request: Request, { params }: { params: { id: number } }) => {
+export async function GET(request: NextRequest, context: { params: { id: string } }) {
 
   const session = await validateToken()
 
@@ -11,13 +11,13 @@ export const GET = async (request: Request, { params }: { params: { id: number }
   }
 
   try {
-    const { id } = await params;
+    const { id } = await context.params;
 
     if (!id) {
       return NextResponse.json({ message: 'ID de tarea es necesario' }, { status: 400 });
     }
 
-    const task = await TaskHistoryService.getAllTaskHistory(id);
+    const task = await TaskHistoryService.getAllTaskHistory(parseInt(id));
 
     return NextResponse.json(task, { status: 200 }); 
 
@@ -26,7 +26,7 @@ export const GET = async (request: Request, { params }: { params: { id: number }
   }
 }
 
-export const DELETE = async (request: Request, { params }: { params: { id: string } }) => {
+export const DELETE = async (request: NextRequest, context: { params: { id: string } }) => {
 
   const session = await validateToken()
 
@@ -45,7 +45,7 @@ export const DELETE = async (request: Request, { params }: { params: { id: strin
 
     } else {
       
-      const id_user = parseInt(params.id);
+      const id_user = parseInt(context.params.id);
       await TaskHistoryService.deleteAllTaskHistory(id_user);
       return NextResponse.json({ success: true, message: 'Historial completo eliminado correctamente' });
 
