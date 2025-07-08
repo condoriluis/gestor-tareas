@@ -122,9 +122,7 @@ const TaskList: React.FC<TaskListProps> = () => {
     }
 
     if (newStatus === 'done') {
-      dateStart = date_start_old.includes('T') ? 
-        DateTime.fromISO(date_start_old).setZone('America/La_Paz').toFormat('yyyy-MM-dd HH:mm:ss') : 
-        date_start_old;
+      dateStart = date_start_old;
       dateCompleted = DateTime.now().setZone('America/La_Paz').toFormat('yyyy-MM-dd HH:mm:ss');
     }
 
