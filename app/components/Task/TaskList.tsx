@@ -47,17 +47,6 @@ const TaskList: React.FC<TaskListProps> = () => {
   const [currentDragTask, setCurrentDragTask] = useState<Task | null>(null);
   const [touchStartTime, setTouchStartTime] = useState(0);
 
-  // Estados para animación
-  type TouchAnimation = {
-    x: number;
-    y: number;
-    scale: number;
-    opacity: number;
-    easing: string;
-  };
-  const [touchAnimation, setTouchAnimation] = useState<TouchAnimation | null>(null);
-  const [dropTarget, setDropTarget] = useState<string | null>(null);
-
   useEffect(() => {
     const fetchTasks = async () => {
       try {
@@ -218,50 +207,13 @@ const TaskList: React.FC<TaskListProps> = () => {
 
   // Manejadores táctiles
   const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>, task: Task) => {
-    const touch = e.touches[0];
     setTouchStartTime(Date.now());
     setCurrentDragTask(task);
-    setTouchAnimation({
-      x: touch.clientX,
-      y: touch.clientY,
-      scale: 1.05,
-      opacity: 1,
-      easing: 'ease-in-out'
-    });
-    e.preventDefault();
-  };
-
-  const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
-    if (!currentDragTask || !touchAnimation) return;
-    
-    const touch = e.touches[0];
-    const element = document.elementFromPoint(touch.clientX, touch.clientY);
-    
-    // Actualizar posición y escala
-    setTouchAnimation({
-      x: touch.clientX,
-      y: touch.clientY,
-      scale: 1.1,
-      opacity: 0.8,
-      easing: 'ease-in-out'
-    });
-    
-    // Detectar zona de drop
-    if (element?.closest('.status-column')) {
-      setDropTarget(element.closest('.status-column')?.getAttribute('data-status') || null);
-    } else {
-      setDropTarget(null);
-    }
-    
     e.preventDefault();
   };
 
   const handleTouchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
-    if (!currentDragTask || !touchAnimation || Date.now() - touchStartTime < 100) {
-      setTouchAnimation(null);
-      setDropTarget(null);
-      return;
-    }
+    if (!currentDragTask || Date.now() - touchStartTime < 100) return;
     
     const touch = e.changedTouches[0];
     const element = document.elementFromPoint(touch.clientX, touch.clientY);
@@ -269,43 +221,18 @@ const TaskList: React.FC<TaskListProps> = () => {
     if (element?.closest('.status-column')) {
       const newStatus = element.closest('.status-column')?.getAttribute('data-status');
       if (newStatus) {
-        // Animación de confirmación
-        setTouchAnimation({
-          x: touch.clientX,
-          y: touch.clientY,
-          scale: 0.95,
-          opacity: 0.5,
-          easing: 'ease-in-out'
-        });
-        
-        setTimeout(() => {
-          handleStatusChange(
-            currentDragTask.id_task, 
-            newStatus, 
-            currentDragTask.title_task, 
-            currentDragTask.priority_task,
-            currentDragTask.status_task,
-            currentDragTask.date_start_task || ''
-          );
-          setTouchAnimation(null);
-          setDropTarget(null);
-        }, 150);
-        return;
+        handleStatusChange(
+          currentDragTask.id_task, 
+          newStatus, 
+          currentDragTask.title_task, 
+          currentDragTask.priority_task,
+          currentDragTask.status_task,
+          currentDragTask.date_start_task || ''
+        );
       }
     }
     
-    // Animación de cancelación
-    setTouchAnimation({
-      ...touchAnimation,
-      scale: 0.9,
-      opacity: 0.2,
-      easing: 'ease-in-out'
-    });
-    
-    setTimeout(() => {
-      setTouchAnimation(null);
-      setDropTarget(null);
-    }, 200);
+    setCurrentDragTask(null);
   };
 
   return (
@@ -391,17 +318,7 @@ const TaskList: React.FC<TaskListProps> = () => {
                           onUpdate={handleUpdateTask} 
                           onDeleteSuccess={handleDeleteTask} 
                           onTouchStart={(e) => handleTouchStart(e, task)}
-                          onTouchMove={handleTouchMove}
                           onTouchEnd={handleTouchEnd}
-                          style={{
-                            ...(currentDragTask?.id_task === task.id_task && touchAnimation ? {
-                              transform: `translate(${touchAnimation.x - 50}px, ${touchAnimation.y - 50}px) scale(${touchAnimation.scale})`,
-                              opacity: touchAnimation.opacity,
-                              transition: `transform 0.2s ${touchAnimation.easing}, opacity 0.2s ${touchAnimation.easing}`,
-                              zIndex: 1000,
-                              boxShadow: dropTarget ? '0 0 15px rgba(0, 229, 123, 0.7)' : '0 0 10px rgba(0,0,0,0.3)'
-                            } : {})
-                          }}
                         />
                       ))}
 

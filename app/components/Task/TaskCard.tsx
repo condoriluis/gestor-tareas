@@ -13,20 +13,10 @@ interface TaskCardProps {
   onUpdate: (updatedTask: Task) => Promise<void>;
   onDeleteSuccess: (id: number) => void;
   onTouchStart?: (e: React.TouchEvent<HTMLDivElement>) => void;
-  onTouchMove?: (e: React.TouchEvent<HTMLDivElement>) => void;
   onTouchEnd?: (e: React.TouchEvent<HTMLDivElement>) => void;
-  style?: React.CSSProperties;
 }
 
-const TaskCard: React.FC<TaskCardProps> = ({ 
-  task, 
-  onUpdate, 
-  onDeleteSuccess, 
-  onTouchStart, 
-  onTouchMove, 
-  onTouchEnd, 
-  style 
-}) => {
+const TaskCard: React.FC<TaskCardProps> = ({ task, onUpdate, onDeleteSuccess, onTouchStart, onTouchEnd }) => {
   const [editMode, setEditMode] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -87,10 +77,8 @@ const TaskCard: React.FC<TaskCardProps> = ({
     <div
       ref={ref}
       onTouchStart={onTouchStart}
-      onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
-      style={style}
-      className={`p-4 bg-[#343434] text-white rounded-lg shadow-lg transition-transform duration-200 ${
+      className={`p-4 bg-[#343434] text-white rounded-lg shadow-lg ${
         isDragging ? "opacity-25 border border-[#00E57B] border-dotted" : ""
       } ${editMode ? "cursor-default" : "cursor-grab"}`}
     >
