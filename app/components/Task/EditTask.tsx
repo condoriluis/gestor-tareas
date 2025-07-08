@@ -100,10 +100,7 @@ const EditTask: React.FC<EditTaskProps> = ({
         placeholder="Escribe la descripción"
         value={description}
         onChange={(e) => 
-          setDescription(e.target.value
-            .charAt(0)
-            .toUpperCase() + e.target.value.slice(1)
-            .toLowerCase(), 
+          setDescription(e.target.value, 
           )
         }
         className="w-full text-white p-2 mb-1 rounded bg-[#2A2A2A] focus:outline-none focus:ring-2 focus:ring-[#00E57B]"

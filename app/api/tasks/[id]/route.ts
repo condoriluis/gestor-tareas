@@ -3,6 +3,7 @@ import { validateToken } from '@/utils/validateToken'
 import { TaskService } from '../TaskService';
 import { UserService } from '../../auth/UserService';
 import { TaskHistoryService } from '../../tasks/TaskHistoryService';
+import { DateTime } from 'luxon';
 
 // Obtener una tarea por ID (GET /api/tasks/[id])
 export const GET = async (request: Request, { params }: { params: Promise<{ id: string }> }) => {
@@ -66,7 +67,19 @@ export const PUT = async (request: Request, { params }: { params: Promise<{ id: 
       const { status, date_start, date_completed,
         old_status, new_status, action_history, description_history } = body;
 
-      await TaskService.updateTaskStatus(session.id_user, user.rol_user, parseInt(id), status, date_start, date_completed);
+      const validatedDateStart = date_start 
+        ? (typeof date_start === 'string' && date_start.includes('T')
+            ? DateTime.fromISO(date_start).setZone('America/La_Paz').toFormat('yyyy-MM-dd HH:mm:ss')
+            : date_start)
+        : null;
+        
+      const validatedDateCompleted = date_completed
+        ? (typeof date_completed === 'string' && date_completed.includes('T')
+            ? DateTime.fromISO(date_completed).setZone('America/La_Paz').toFormat('yyyy-MM-dd HH:mm:ss')
+            : date_completed)
+        : null;
+
+      await TaskService.updateTaskStatus(session.id_user, user.rol_user, parseInt(id), status, validatedDateStart, validatedDateCompleted);
       await TaskHistoryService.createTaskHistory(parseInt(id), session.id_user, old_status, new_status, action_history, description_history);
     } 
 
