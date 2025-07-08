@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { validateToken } from '@/utils/validateToken'
 import { TaskHistoryService } from '../../tasks/TaskHistoryService';
 
-export const GET = async (request: Request, { params }: { params: { id: number } }) => {
+export const GET = async (request: Request, { params }: { params: { id: string } }) => {
 
   const session = await validateToken()
 
@@ -17,7 +17,7 @@ export const GET = async (request: Request, { params }: { params: { id: number }
       return NextResponse.json({ message: 'ID de tarea es necesario' }, { status: 400 });
     }
 
-    const task = await TaskHistoryService.getAllTaskHistory(id);
+    const task = await TaskHistoryService.getAllTaskHistory(parseInt(id, 10));
 
     return NextResponse.json(task, { status: 200 }); 
 
