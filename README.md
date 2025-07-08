@@ -2,6 +2,9 @@
 
 > Este es un proyecto de **gestor de tareas** desarrollado con **Next.js**, **React** y **TypeScript**. La aplicación permite a los usuarios agregar, editar, eliminar y visualizar tareas de forma eficiente y con un diseño intuitivo. Ideal para mantener el seguimiento de tareas personales o de trabajo.
 
+## 🌐 Aplicación en Producción
+[Visitar aplicación](https://gestor-tareas-luis.vercel.app)
+
 ## 🚀 Demo en Vivo
 [Ver demostración](https://player.vimeo.com/video/1099463374)
 
