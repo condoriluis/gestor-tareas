@@ -5,7 +5,7 @@ import { UserService } from '../../auth/UserService';
 import { TaskHistoryService } from '../../tasks/TaskHistoryService';
 
 // Obtener una tarea por ID (GET /api/tasks/[id])
-export const GET = async (request: Request, { params }: { params: { id: number } }) => {
+export const GET = async (request: Request, { params }: { params: Promise<{ id: string }> }) => {
 
   const session = await validateToken()
 
@@ -20,7 +20,7 @@ export const GET = async (request: Request, { params }: { params: { id: number }
       return NextResponse.json({ message: 'ID de tarea es necesario' }, { status: 400 });
     }
 
-    const task = await TaskService.getAllTasks(id);
+    const task = await TaskService.getAllTasks(parseInt(id));
 
     return NextResponse.json(task, { status: 200 });
 
@@ -30,7 +30,7 @@ export const GET = async (request: Request, { params }: { params: { id: number }
 }
 
 // Actualizar una tarea (PUT /api/tasks/[id])
-export const PUT = async (request: Request, { params }: { params: { id: number } }) => {
+export const PUT = async (request: Request, { params }: { params: Promise<{ id: string }> }) => {
 
   const session = await validateToken()
 
@@ -58,23 +58,23 @@ export const PUT = async (request: Request, { params }: { params: { id: number }
       const { title, description, priority, 
         old_status, new_status, action_history, description_history } = body; 
         
-      await TaskService.updateTask(session.id_user, user.rol_user, id, title, description, priority);
-      await TaskHistoryService.createTaskHistory(id, session.id_user, old_status, new_status, action_history, description_history);
+      await TaskService.updateTask(session.id_user, user.rol_user, parseInt(id), title, description, priority);
+      await TaskHistoryService.createTaskHistory(parseInt(id), session.id_user, old_status, new_status, action_history, description_history);
     
     } 
     else if (type === 'status') {
       const { status, date_start, date_completed,
         old_status, new_status, action_history, description_history } = body;
 
-      await TaskService.updateTaskStatus(session.id_user, user.rol_user, id, status, date_start, date_completed);
-      await TaskHistoryService.createTaskHistory(id, session.id_user, old_status, new_status, action_history, description_history);
+      await TaskService.updateTaskStatus(session.id_user, user.rol_user, parseInt(id), status, date_start, date_completed);
+      await TaskHistoryService.createTaskHistory(parseInt(id), session.id_user, old_status, new_status, action_history, description_history);
     } 
 
     else {
       return NextResponse.json({ message: 'Tipo de operación inválido' }, { status: 400 });
     }
 
-    const updatedTask = await TaskService.getTaskById(id);
+    const updatedTask = await TaskService.getTaskById(parseInt(id));
 
     return NextResponse.json(updatedTask, { status: 200 });
 
@@ -84,7 +84,7 @@ export const PUT = async (request: Request, { params }: { params: { id: number }
 };
 
 // Eliminar una tarea (DELETE /api/tasks/[id])
-export const DELETE = async (request: Request, { params }: { params: { id: number } }) => {
+export const DELETE = async (request: Request, { params }: { params: Promise<{ id: string }> }) => {
 
   const session = await validateToken()
 
@@ -103,13 +103,13 @@ export const DELETE = async (request: Request, { params }: { params: { id: numbe
     const body = await request.json();
     const { old_status, new_status, action_history, description_history } = body;
    
-    const deletedRows = await TaskService.deleteTask(id);
+    const deletedRows = await TaskService.deleteTask(parseInt(id));
 
     if (deletedRows === 0) {
       return NextResponse.json({ message: 'Tarea no encontrada' }, { status: 404 });
     }
 
-    await TaskHistoryService.createTaskHistory(id, session.id_user, old_status, new_status, action_history, description_history);
+    await TaskHistoryService.createTaskHistory(parseInt(id), session.id_user, old_status, new_status, action_history, description_history);
     return NextResponse.json({ message: 'Tarea eliminada correctamente.' }, { status: 200 });
 
   } catch (error) {
