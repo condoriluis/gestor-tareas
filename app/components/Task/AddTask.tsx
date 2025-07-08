@@ -17,8 +17,8 @@ const AddTask: React.FC<AddTaskProps> = ({ onCreate, onCancel }) => {
     description_task: '',
     priority_task: 'low',
     status_task: 'todo',
-    date_start_task: '',
-    date_completed_task: '',
+    date_start_task: null,
+    date_completed_task: null,
     date_created_task: ''
   });
 
@@ -80,8 +80,8 @@ const AddTask: React.FC<AddTaskProps> = ({ onCreate, onCancel }) => {
         description_task: '', 
         priority_task: 'low', 
         status_task: 'todo', 
-        date_start_task: '',
-        date_completed_task: '',
+        date_start_task: null,
+        date_completed_task: null,
         date_created_task: '',
       });
     } catch (error) {

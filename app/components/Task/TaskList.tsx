@@ -107,22 +107,24 @@ const TaskList: React.FC<TaskListProps> = () => {
       )
     );
   
-    let dateStart = '';
-    let dateCompleted = '';
+    let dateStart = null;
+    let dateCompleted = null;
     let prioridad = '';
 
     if (newStatus === 'todo') {
-      dateStart = '';
-      dateCompleted = '';
+      dateStart = null;
+      dateCompleted = null;
     }
 
     if (newStatus === 'in_progress') {
       dateStart = DateTime.now().setZone('America/La_Paz').toFormat('yyyy-MM-dd HH:mm:ss');
-      dateCompleted = '';
+      dateCompleted = null;
     }
 
     if (newStatus === 'done') {
-      dateStart = date_start_old;
+      dateStart = date_start_old.includes('T') ? 
+        DateTime.fromISO(date_start_old).setZone('America/La_Paz').toFormat('yyyy-MM-dd HH:mm:ss') : 
+        date_start_old;
       dateCompleted = DateTime.now().setZone('America/La_Paz').toFormat('yyyy-MM-dd HH:mm:ss');
     }
 
@@ -254,7 +256,7 @@ const TaskList: React.FC<TaskListProps> = () => {
             {statuses.map(({ key, label, color }) => {
               const [, drop] = useDrop(() => ({
                 accept: "TASK",
-                drop: (item: Task) => handleStatusChange(item.id_task, key, item.title_task, item.priority_task, item.status_task, item.date_start_task),
+                drop: (item: Task) => handleStatusChange(item.id_task, key, item.title_task, item.priority_task, item.status_task, item.date_start_task || ''),
               }));
 
               const ref = useRef<HTMLDivElement | null>(null);
