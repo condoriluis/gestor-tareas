@@ -68,7 +68,9 @@ export default function LoginForm() {
     try {
       await login(email, password);
       showToast('Inicio de sesión exitoso.', 'success');
+      await new Promise(resolve => setTimeout(resolve, 100));
       router.push('/task');
+      router.refresh();
     } catch (error) {
       showToast('Credenciales incorrectas.', 'error');
     } finally {
