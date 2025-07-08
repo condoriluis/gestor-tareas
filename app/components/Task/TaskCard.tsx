@@ -12,14 +12,39 @@ interface TaskCardProps {
   task: Task;
   onUpdate: (updatedTask: Task) => Promise<void>;
   onDeleteSuccess: (id: number) => void;
-  onTouchStart?: (e: React.TouchEvent<HTMLDivElement>) => void;
-  onTouchEnd?: (e: React.TouchEvent<HTMLDivElement>) => void;
+  onMobileStatusChange: (task: Task) => void;
 }
 
-const TaskCard: React.FC<TaskCardProps> = ({ task, onUpdate, onDeleteSuccess, onTouchStart, onTouchEnd }) => {
+const TaskCard: React.FC<TaskCardProps> = ({ task, onUpdate, onDeleteSuccess, onMobileStatusChange }) => {
   const [editMode, setEditMode] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  const isMobile = window.innerWidth <= 768;
+
+  const [pressTimer, setPressTimer] = useState<NodeJS.Timeout | null>(null);
+
+  const handleTouchStart = () => {
+    if (isMobile) {
+      const timer = setTimeout(() => {
+        onMobileStatusChange(task);
+      }, 500);
+      setPressTimer(timer);
+    }
+  };
+
+  const handleTouchEnd = () => {
+    if (pressTimer) {
+      clearTimeout(pressTimer);
+      setPressTimer(null);
+    }
+  };
+
+  const handleLongPress = () => {
+    if (isMobile) {
+      onMobileStatusChange(task);
+    }
+  };
 
   const [{ isDragging }, drag] = useDrag(() => ({
     type: "TASK",
@@ -76,11 +101,12 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onUpdate, onDeleteSuccess, on
   return (
     <div
       ref={ref}
-      onTouchStart={onTouchStart}
-      onTouchEnd={onTouchEnd}
       className={`p-4 bg-[#343434] text-white rounded-lg shadow-lg ${
         isDragging ? "opacity-25 border border-[#00E57B] border-dotted" : ""
       } ${editMode ? "cursor-default" : "cursor-grab"}`}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+      onContextMenu={handleLongPress}
     >
       {editMode ? (
         <EditTask

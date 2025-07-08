@@ -15,6 +15,7 @@ import { MdClose, MdArrowBack, MdInfoOutline } from 'react-icons/md';
 import { useAuth } from '../../context/AuthContext';
 import { useTaskUser } from '@/app/context/TaskUserContext';
 import ConfirmModal from './ConfirmModal';
+import { StatusChangeModal } from './StatusChangeModal';
 
 interface TaskListProps {}
 
@@ -42,10 +43,8 @@ const TaskList: React.FC<TaskListProps> = () => {
     date_start_old: string;
   } | null>(null);
 
-  // Añadir estado para el arrastre táctil
-  const [touchStartPos, setTouchStartPos] = useState({x: 0, y: 0});
-  const [currentDragTask, setCurrentDragTask] = useState<Task | null>(null);
-  const [touchStartTime, setTouchStartTime] = useState(0);
+  const [showStatusModal, setShowStatusModal] = useState(false);
+  const [currentTask, setCurrentTask] = useState<Task | null>(null);
 
   useEffect(() => {
     const fetchTasks = async () => {
@@ -103,6 +102,40 @@ const TaskList: React.FC<TaskListProps> = () => {
 
     // Para otros estados (todo) no requiere confirmación
     await processStatusChange(taskId, newStatus, title, priority, status_old, date_start_old);
+  };
+
+  const handleMobileStatusChange = (task: Task) => {
+    setCurrentTask(task);
+    setShowStatusModal(true);
+  };
+
+  const handleStatusChangeMobile = (newStatus: string) => {
+    if (!currentTask) return;
+  
+    if (newStatus === 'done') {
+      setConfirmTitle('Confirmar completado');
+      setConfirmMessage(`¿Estás seguro de marcar como completada la tarea "${currentTask.title_task}"?`);
+      setPendingStatusChange({
+        taskId: currentTask.id_task,
+        newStatus,
+        title: currentTask.title_task,
+        priority: currentTask.priority_task,
+        status_old: currentTask.status_task,
+        date_start_old: currentTask.date_start_task || ''
+      });
+      setShowConfirmModal(true);
+    } else {
+      processStatusChange(
+        currentTask.id_task,
+        newStatus,
+        currentTask.title_task,
+        currentTask.priority_task,
+        currentTask.status_task,
+        currentTask.date_start_task || ''
+      );
+    }
+  
+    setShowStatusModal(false);
   };
 
   const processStatusChange = async (taskId: number, newStatus: string, title: string, priority: string, status_old: string, date_start_old: string) => {
@@ -205,36 +238,6 @@ const TaskList: React.FC<TaskListProps> = () => {
     return true;
   });
 
-  // Manejadores táctiles
-  const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>, task: Task) => {
-    setTouchStartTime(Date.now());
-    setCurrentDragTask(task);
-    e.preventDefault();
-  };
-
-  const handleTouchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
-    if (!currentDragTask || Date.now() - touchStartTime < 100) return;
-    
-    const touch = e.changedTouches[0];
-    const element = document.elementFromPoint(touch.clientX, touch.clientY);
-    
-    if (element?.closest('.status-column')) {
-      const newStatus = element.closest('.status-column')?.getAttribute('data-status');
-      if (newStatus) {
-        handleStatusChange(
-          currentDragTask.id_task, 
-          newStatus, 
-          currentDragTask.title_task, 
-          currentDragTask.priority_task,
-          currentDragTask.status_task,
-          currentDragTask.date_start_task || ''
-        );
-      }
-    }
-    
-    setCurrentDragTask(null);
-  };
-
   return (
     <div className="min-h-screen bg-[#1E1E1E] text-white">
       <Navbar 
@@ -304,8 +307,7 @@ const TaskList: React.FC<TaskListProps> = () => {
                 <div
                   key={key}
                   ref={ref}
-                  className={`bg-[#2A2A2A] p-4 rounded-lg border-2 ${color} shadow-lg status-column`}
-                  data-status={key}
+                  className={`bg-[#2A2A2A] p-4 rounded-lg border-2 ${color} shadow-lg`}
                 >
                   <h2 className="text-lg font-semibold text-white text-center mb-4">{label}</h2>
                   <div className="space-y-3">
@@ -317,8 +319,7 @@ const TaskList: React.FC<TaskListProps> = () => {
                           task={task} 
                           onUpdate={handleUpdateTask} 
                           onDeleteSuccess={handleDeleteTask} 
-                          onTouchStart={(e) => handleTouchStart(e, task)}
-                          onTouchEnd={handleTouchEnd}
+                          onMobileStatusChange={handleMobileStatusChange}
                         />
                       ))}
 
@@ -357,6 +358,19 @@ const TaskList: React.FC<TaskListProps> = () => {
             tasks={tasks}
           />
 
+          {showStatusModal && currentTask && (
+            <StatusChangeModal
+              taskTitle={currentTask.title_task}
+              options={[
+                { label: 'Mover a TODO', value: 'todo', disabled: currentTask.status_task === 'todo' },
+                { label: 'Mover a EN PROGRESO', value: 'in_progress', disabled: currentTask.status_task === 'in_progress' },
+                { label: 'Mover a COMPLETADO', value: 'done', disabled: currentTask.status_task === 'done' }
+              ]}
+              currentStatus={currentTask.status_task}
+              onClose={() => setShowStatusModal(false)}
+              onStatusChange={handleStatusChangeMobile}
+            />
+          )}
         </main>
         
         <Historial user={user} />
