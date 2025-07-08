@@ -16,7 +16,7 @@ export async function POST(request: Request) {
   
   try {
     
-    const newTaskId = await TaskService.createTask(session.id_user, title_task, description_task, priority_task, status_task, '0000-00-00 00:00:00', '0000-00-00 00:00:00');
+    const newTaskId = await TaskService.createTask(session.id_user, title_task, description_task, priority_task, status_task, date_start_task, date_completed_task);
     const newTask = await TaskService.getTaskById(newTaskId);
     
     if (!newTask) {
