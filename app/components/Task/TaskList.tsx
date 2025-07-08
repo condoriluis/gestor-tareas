@@ -112,13 +112,13 @@ const TaskList: React.FC<TaskListProps> = () => {
     let prioridad = '';
 
     if (newStatus === 'todo') {
-      dateStart = '0000-00-00 00:00:00';
-      dateCompleted = '0000-00-00 00:00:00';
+      dateStart = '';
+      dateCompleted = '';
     }
 
     if (newStatus === 'in_progress') {
       dateStart = DateTime.now().setZone('America/La_Paz').toFormat('yyyy-MM-dd HH:mm:ss');
-      dateCompleted = '0000-00-00 00:00:00';
+      dateCompleted = '';
     }
 
     if (newStatus === 'done') {
