@@ -2,7 +2,7 @@ import React, { useRef, useState } from "react";
 import { useDrag } from 'react-dnd';
 import EditTask from "./EditTask"
 import { Task } from '@/utils/types'
-import { formatDate } from '@/utils/dateFormat';
+import { formatDate } from '@/utils/dateService';
 import { MdAccessTime , MdCancel, MdEdit, MdDelete, MdClose, MdInfo } from "react-icons/md";
 import { FaCircle } from "react-icons/fa";
 import { showToast } from "@/utils/toastMessages";

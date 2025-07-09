@@ -18,12 +18,34 @@ type HistorialProps = {
 };
 
 export default function Historial({ user }: HistorialProps) {
-  const [isOpen, setIsOpen] = useState(true);
   const [isHovered, setIsHovered] = useState(false);
   const [history, setHistory] = useState<TaskHistory[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<string>('all');
   const {userId} = useTaskUser();
+  
+  const [isOpen, setIsOpen] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  useEffect(() => {
+    
+    const isDesktop = window.innerWidth >= 768;
+    setIsOpen(isDesktop);
+    setIsInitialized(true);
+    
+    const handleResize = () => {
+      if (window.innerWidth >= 768 && !isOpen) {
+        setIsOpen(true);
+      }
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const toggleHistorial = () => {
+    setIsOpen(prev => !prev);
+  };
 
   useEffect(() => {
     const fetchHistory = async () => {
@@ -37,16 +59,14 @@ export default function Historial({ user }: HistorialProps) {
         const data = await response.json();
         setHistory(data);
       } catch (error) {
-        showToast('Error al cargar el historial de actividades.', 'error');
+        console.error('Error fetching history:', error);
       }
     };
-    
-    fetchHistory();
-    
-    const listener = () => fetchHistory();
-    window.addEventListener('history-refresh', listener);
-    return () => window.removeEventListener('history-refresh', listener);
-  }, [user?.id_user, userId]);
+
+    if (isOpen && isInitialized) {
+      fetchHistory();
+    }
+  }, [user?.id_user, userId, isOpen, isInitialized]);
 
   const formatHistoryDate = (dateString: string) => {
     const now = new Date();
@@ -107,10 +127,8 @@ export default function Historial({ user }: HistorialProps) {
   };
 
   const filteredHistory = history.filter(item => {
-    // Filtro por término de búsqueda (title)
     const matchesSearch = item.description_history.toLowerCase().includes(searchTerm.toLowerCase());
     
-    // Filtro por tipo
     const matchesType = filterType === 'all' || 
       (filterType === 'creation' && item.action_history.includes('Tarea creada')) ||
       (filterType === 'edition' && item.action_history.includes('Tarea editada')) ||
@@ -167,7 +185,7 @@ export default function Historial({ user }: HistorialProps) {
   return (
     <>
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={toggleHistorial}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         className={`
@@ -197,7 +215,7 @@ export default function Historial({ user }: HistorialProps) {
             {isOpen ? 'Historial de actividades' : ''}
           </h3>
           <button 
-            onClick={() => setIsOpen(!isOpen)}
+            onClick={toggleHistorial}
             className="text-gray-400 hover:text-white transition-colors cursor-pointer"
             aria-label={isOpen ? 'Cerrar sidebar' : 'Abrir sidebar'}
           >
@@ -338,7 +356,6 @@ export default function Historial({ user }: HistorialProps) {
         </div>
       </aside>
 
-      {/* Dialog de confirmación personalizado */}
       {showDeleteDialog && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-2 sm:p-4 transition-opacity duration-300">
           <div className="bg-[#2A2A2A] rounded-lg p-6 max-w-md w-full shadow-xl animate-fade-in-up">

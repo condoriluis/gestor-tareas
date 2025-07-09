@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useDrop } from 'react-dnd';
 import { showToast } from "@/utils/toastMessages";
-import { DateTime } from 'luxon';
+import { nowBolivia, toBoliviaDateTime } from '@/utils/dateService';
 import { Task } from '@/utils/types'
 import TaskCard from './TaskCard';
 import AddTask from './AddTask';
@@ -30,7 +30,6 @@ const TaskList: React.FC<TaskListProps> = () => {
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   
-  // Estados para el modal de confirmación
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [confirmMessage, setConfirmMessage] = useState('');
   const [confirmTitle, setConfirmTitle] = useState('');
@@ -100,7 +99,6 @@ const TaskList: React.FC<TaskListProps> = () => {
       return;
     }
 
-    // Para otros estados (todo) no requiere confirmación
     await processStatusChange(taskId, newStatus, title, priority, status_old, date_start_old);
   };
 
@@ -109,12 +107,22 @@ const TaskList: React.FC<TaskListProps> = () => {
     setShowStatusModal(true);
   };
 
-  const handleStatusChangeMobile = (newStatus: string) => {
+  const handleStatusChangeMobile = async (newStatus: string) => {
     if (!currentTask) return;
-  
-    if (newStatus === 'done') {
-      setConfirmTitle('Confirmar completado');
-      setConfirmMessage(`¿Estás seguro de marcar como completada la tarea "${currentTask.title_task}"?`);
+    
+    // Validar cambio directo de TODO -> DONE (no permitido)
+    if (currentTask.status_task === 'todo' && newStatus === 'done') {
+      showToast('No puedes marcar como completada una tarea que no ha comenzado', 'error');
+      setShowStatusModal(false);
+      return;
+    }
+    
+    // Mostrar confirmación para TODO -> IN_PROGRESS o IN_PROGRESS -> DONE
+    if ((currentTask.status_task === 'todo' && newStatus === 'in_progress') || 
+        (currentTask.status_task === 'in_progress' && newStatus === 'done')) {
+      const action = newStatus === 'in_progress' ? 'comenzar' : 'completar';
+      setConfirmTitle(`Confirmar ${action} tarea`);
+      setConfirmMessage(`¿Estás seguro que deseas ${action} la tarea "${currentTask.title_task}"?`);
       setPendingStatusChange({
         taskId: currentTask.id_task,
         newStatus,
@@ -124,17 +132,19 @@ const TaskList: React.FC<TaskListProps> = () => {
         date_start_old: currentTask.date_start_task || ''
       });
       setShowConfirmModal(true);
-    } else {
-      processStatusChange(
-        currentTask.id_task,
-        newStatus,
-        currentTask.title_task,
-        currentTask.priority_task,
-        currentTask.status_task,
-        currentTask.date_start_task || ''
-      );
+      setShowStatusModal(false);
+      return;
     }
-  
+    
+    // Para otros cambios, actualizar directamente
+    await processStatusChange(
+      currentTask.id_task,
+      newStatus,
+      currentTask.title_task,
+      currentTask.priority_task,
+      currentTask.status_task,
+      currentTask.date_start_task || ''
+    );
     setShowStatusModal(false);
   };
 
@@ -155,18 +165,18 @@ const TaskList: React.FC<TaskListProps> = () => {
     }
 
     if (newStatus === 'in_progress') {
-      dateStart = DateTime.now().setZone('America/La_Paz').toFormat('yyyy-MM-dd HH:mm:ss');
+      dateStart = nowBolivia();
       dateCompleted = null;
     }
 
     if (newStatus === 'done') {
       dateStart = date_start_old 
         ? (typeof date_start_old === 'string' && date_start_old.includes('T') 
-            ? DateTime.fromISO(date_start_old).setZone('America/La_Paz').toFormat('yyyy-MM-dd HH:mm:ss')
+            ? toBoliviaDateTime(date_start_old)
             : date_start_old)
-        : DateTime.now().setZone('America/La_Paz').toFormat('yyyy-MM-dd HH:mm:ss');
+        : nowBolivia();
       
-      dateCompleted = DateTime.now().setZone('America/La_Paz').toFormat('yyyy-MM-dd HH:mm:ss');
+      dateCompleted = nowBolivia();
     }
 
     if (priority === 'low') {
@@ -250,7 +260,12 @@ const TaskList: React.FC<TaskListProps> = () => {
       />
       
       <div className="flex flex-1 overflow-hidden">
-        <main className="flex-1 overflow-y-auto p-4 scrollbar-custom">
+        <main className="flex-1 p-4 md:p-6 overflow-y-auto scrollbar-custom">
+          <div className="md:hidden flex items-center justify-center text-sm text-gray-400">
+            <MdInfoOutline className="mr-1" />
+            <span>Pulsa una tarea para cambiar su estado</span>
+          </div>
+
           {userId && (
             <div className="flex flex-col gap-3">
               <div className="flex items-center justify-between">

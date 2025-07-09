@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { MdClose, MdVisibility, MdVisibilityOff, MdAdminPanelSettings, MdPerson } from 'react-icons/md';
-import { formatDate } from '@/utils/dateFormat';
+import { formatDate } from '@/utils/dateService';
 import { showToast } from '@/utils/toastMessages';
 
 type UserModalProps = {

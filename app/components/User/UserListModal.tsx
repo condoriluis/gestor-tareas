@@ -1,9 +1,9 @@
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
-import { MdClose, MdEmail, MdWork, MdCancel, MdOutlinePeople, MdOutlineAssignment, MdPersonAdd } from 'react-icons/md';
+import { MdClose, MdEmail, MdCancel, MdOutlinePeople, MdOutlineAssignment, MdPersonAdd, MdEdit, MdAdd } from 'react-icons/md';
 import { showToast } from '@/utils/toastMessages';
-import { formatDate } from '@/utils/dateFormat';
+import { formatDate } from '@/utils/dateService';
 import { useRouter } from 'next/navigation';
 import { useTaskUser } from '@/app/context/TaskUserContext';
 import EditUser from './EditUser';
@@ -13,7 +13,6 @@ import UserTable from './UserTable';
 import DeleteUser from './DeleteUser';
 import AddUser from './AddUser';
 
-// Mover los tipos antes del componente y exportarlos
 export type User = {
   id_user: number;
   name_user: string;
@@ -35,7 +34,6 @@ export default function UserListModal() {
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
   
-  // Filtros y búsqueda
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
@@ -46,26 +44,22 @@ export default function UserListModal() {
   const [statusFilter, setStatusFilter] = useState<number | null>(null);
   const [roleFilter, setRoleFilter] = useState<string | null>(null);
 
-  // Estados para edición/eliminación
   const [, setEditModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [userToEdit, setUserToEdit] = useState<User | null>(null);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
   const [addUserModalOpen, setAddUserModalOpen] = useState(false);
 
-  // Abrir modal de edición
   const openEditModal = (user: User) => {
     setUserToEdit(user);
     setEditModalOpen(true);
   };
 
-  // Abrir modal de eliminación
   const openDeleteModal = (user: User) => {
     setUserToDelete(user);
     setDeleteModalOpen(true);
   };
 
-  // Cerrar modales
   const closeEditModal = () => {
     setEditModalOpen(false);
     setUserToEdit(null);
@@ -76,7 +70,6 @@ export default function UserListModal() {
     setUserToDelete(null);
   };
 
-  // Función para refrescar usuarios
   const refreshUsers = async () => {
     setLoading(true);
     try {
@@ -91,18 +84,16 @@ export default function UserListModal() {
     }
   };
 
-  // Obtener usuarios
+
   useEffect(() => {
     if (isOpen) {
       refreshUsers();
     }
   }, [isOpen]);
 
-  // Filtrar y ordenar usuarios
   const filteredUsers = useMemo(() => {
     let filtered = [...users];
     
-    // Aplicar filtro de búsqueda
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
       filtered = filtered.filter(user => 
@@ -111,7 +102,6 @@ export default function UserListModal() {
       );
     }
     
-    // Aplicar filtros de estado y rol
     if (statusFilter !== null) {
       filtered = filtered.filter(user => user.status_user === statusFilter);
     }
@@ -120,7 +110,6 @@ export default function UserListModal() {
       filtered = filtered.filter(user => user.rol_user === roleFilter);
     }
     
-    // Ordenar
     if (sortConfig.key) {
       filtered.sort((a, b) => {
         if (a[sortConfig.key] < b[sortConfig.key]) {
@@ -136,13 +125,11 @@ export default function UserListModal() {
     return filtered;
   }, [users, searchTerm, statusFilter, roleFilter, sortConfig]);
 
-  // Paginación
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredUsers.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
 
-  // Solicitar ordenamiento
   const requestSort = (key: keyof User) => {
     let direction: 'ascending' | 'descending' = 'ascending';
     if (sortConfig.key === key && sortConfig.direction === 'ascending') {
@@ -151,7 +138,6 @@ export default function UserListModal() {
     setSortConfig({ key, direction });
   };
 
-  // Cambiar estado del usuario
   const handleStatusChange = async (idUser: number, newStatus: number) => {
     try {
       const response = await fetch('/api/users', {
@@ -172,7 +158,6 @@ export default function UserListModal() {
     }
   };
 
-  // Editar usuario
   const handleEditSubmit = async (userData: {idUser: number; name: string; email: string; rol: string}) => {
     try {
       const response = await fetch('/api/users', {
@@ -192,7 +177,6 @@ export default function UserListModal() {
     }
   };
 
-  // Eliminar usuario
   const handleDelete = async () => {
     if (!userToDelete) return;
     
@@ -213,7 +197,6 @@ export default function UserListModal() {
     }
   };
 
-  // Añadir función para limpiar filtros
   const clearFilters = () => {
     setSearchTerm('');
     setStatusFilter(null);
@@ -237,14 +220,23 @@ export default function UserListModal() {
             <div className="flex justify-between items-center p-4 border-b border-gray-700">
               <div className="flex items-center gap-2">
                 <h3 className="text-xl font-semibold text-white">Gestión de Usuarios</h3>
+                
                 <button
                   onClick={() => setAddUserModalOpen(true)}
-                  className="flex items-center gap-2 px-2 py-1 bg-[#00E57B] hover:bg-[#00C56A] text-white rounded-lg transition-colors cursor-pointer"
+                  className="hidden md:flex items-center gap-2 px-1 py-1 bg-[#00E57B] hover:bg-[#00C56A] text-white rounded-lg transition-colors cursor-pointer"
                 >
                   <MdPersonAdd size={18} />
-                <span>Nuevo Usuario</span>
-              </button>
+                  <span>Nuevo Usuario</span>
+                </button>
               </div>
+
+              <button
+                onClick={() => setAddUserModalOpen(true)}
+                className="md:hidden fixed bottom-6 right-6 z-50 p-2 bg-[#00E57B] hover:bg-[#00C56A] text-white rounded-full shadow-lg transition-transform hover:scale-105"
+                aria-label="Agregar usuario"
+              >
+                <MdAdd size={24} />
+              </button>
 
               <button 
                 onClick={() => setIsOpen(false)}
@@ -254,8 +246,7 @@ export default function UserListModal() {
               </button>
             </div>
 
-            {/* Barra de búsqueda y filtros */}
-            <div className="p-4 border-b border-gray-700">
+            <div className="border-b border-gray-700">
               <UserFilters
                 searchTerm={searchTerm}
                 onSearchChange={(value) => {
@@ -283,7 +274,6 @@ export default function UserListModal() {
                 </div>
               ) : (
                 <>
-                  {/* Mobile Card View */}
                   <div className="block md:hidden space-y-4 p-4">
                     {currentItems.length > 0 ? (
                       currentItems.map(user => (
@@ -334,7 +324,7 @@ export default function UserListModal() {
                                 setIsOpen(false);
                                 router.push('/task');
                               }}
-                              className="text-[#00E57B] hover:text-teal-400 text-sm flex items-center gap-1 cursor-pointer hover:text-green-700"
+                              className="text-blue-500 hover:text-blue-600 text-sm flex items-center gap-1 cursor-pointer hover:text-green-700"
                             >
                               <MdOutlineAssignment size={16} />
                               <span>Ver tareas</span>
@@ -342,9 +332,9 @@ export default function UserListModal() {
                             <div className="flex gap-2">
                               <button 
                                 onClick={() => openEditModal(user)}
-                                className="text-[#00E57B] hover:text-teal-400 text-sm flex items-center gap-1 cursor-pointer hover:text-green-700"
+                                className="text-yellow-500 hover:text-yellow-600 text-sm flex items-center gap-1 cursor-pointer hover:text-green-700"
                               >
-                                <MdWork size={16} />
+                                <MdEdit size={16} />
                                 <span>Editar</span>
                               </button>
                               <button 
@@ -363,7 +353,6 @@ export default function UserListModal() {
                     )}
                   </div>
 
-                  {/* Desktop Table View */}
                   <UserTable
                     currentItems={currentItems}
                     sortConfig={sortConfig}
@@ -382,7 +371,6 @@ export default function UserListModal() {
               )}
             </div>
 
-            {/* Paginación */}
             {filteredUsers.length > itemsPerPage && (
               <PaginationControls
                 currentPage={currentPage}

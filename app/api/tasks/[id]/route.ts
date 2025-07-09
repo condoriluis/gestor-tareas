@@ -3,7 +3,7 @@ import { validateToken } from '@/utils/validateToken'
 import { TaskService } from '../TaskService';
 import { UserService } from '../../auth/UserService';
 import { TaskHistoryService } from '../../tasks/TaskHistoryService';
-import { DateTime } from 'luxon';
+import { toBoliviaDateTime } from '@/utils/dateService';
 
 // Obtener una tarea por ID (GET /api/tasks/[id])
 export const GET = async (request: Request, { params }: { params: Promise<{ id: string }> }) => {
@@ -69,13 +69,13 @@ export const PUT = async (request: Request, { params }: { params: Promise<{ id: 
 
       const validatedDateStart = date_start 
         ? (typeof date_start === 'string' && date_start.includes('T')
-            ? DateTime.fromISO(date_start).setZone('America/La_Paz').toFormat('yyyy-MM-dd HH:mm:ss')
+            ? toBoliviaDateTime(date_start)
             : date_start)
         : null;
         
       const validatedDateCompleted = date_completed
         ? (typeof date_completed === 'string' && date_completed.includes('T')
-            ? DateTime.fromISO(date_completed).setZone('America/La_Paz').toFormat('yyyy-MM-dd HH:mm:ss')
+            ? toBoliviaDateTime(date_completed)
             : date_completed)
         : null;
 
