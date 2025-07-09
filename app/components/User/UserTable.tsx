@@ -1,7 +1,8 @@
 'use client';
 
 import { MdOutlineAssignment, MdArrowUpward, MdArrowDownward, MdEdit, MdDelete } from 'react-icons/md';
-import { User, SortConfig } from './UserListModal';
+import { SortConfig } from './UserListModal';
+import { User } from '@/utils/types';
 import { formatDate } from '@/utils/dateService';
 
 type UserTableProps = {

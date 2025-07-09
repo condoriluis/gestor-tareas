@@ -1,6 +1,5 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { showToast } from "@/utils/toastMessages";
 import { useState } from 'react';
 import { MdLogout } from 'react-icons/md';

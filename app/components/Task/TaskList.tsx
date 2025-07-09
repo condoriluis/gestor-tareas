@@ -110,14 +110,12 @@ const TaskList: React.FC<TaskListProps> = () => {
   const handleStatusChangeMobile = async (newStatus: string) => {
     if (!currentTask) return;
     
-    // Validar cambio directo de TODO -> DONE (no permitido)
     if (currentTask.status_task === 'todo' && newStatus === 'done') {
       showToast('No puedes marcar como completada una tarea que no ha comenzado', 'error');
       setShowStatusModal(false);
       return;
     }
     
-    // Mostrar confirmación para TODO -> IN_PROGRESS o IN_PROGRESS -> DONE
     if ((currentTask.status_task === 'todo' && newStatus === 'in_progress') || 
         (currentTask.status_task === 'in_progress' && newStatus === 'done')) {
       const action = newStatus === 'in_progress' ? 'comenzar' : 'completar';
@@ -136,7 +134,6 @@ const TaskList: React.FC<TaskListProps> = () => {
       return;
     }
     
-    // Para otros cambios, actualizar directamente
     await processStatusChange(
       currentTask.id_task,
       newStatus,
@@ -260,7 +257,7 @@ const TaskList: React.FC<TaskListProps> = () => {
       />
       
       <div className="flex flex-1 overflow-hidden">
-        <main className="flex-1 p-4 md:p-6 overflow-y-auto scrollbar-custom">
+        <main className="flex-1 p-4 h-[calc(100vh-64px)] md:p-6 overflow-y-auto scrollbar-custom">
           <div className="md:hidden flex items-center justify-center text-sm text-gray-400">
             <MdInfoOutline className="mr-1" />
             <span>Pulsa una tarea para cambiar su estado</span>

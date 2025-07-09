@@ -63,9 +63,16 @@ export default function Historial({ user }: HistorialProps) {
       }
     };
 
+    const handleRefresh = () => fetchHistory();
+    window.addEventListener('history-refresh', handleRefresh);
+
     if (isOpen && isInitialized) {
       fetchHistory();
     }
+    
+    return () => {
+      window.removeEventListener('history-refresh', handleRefresh);
+    };
   }, [user?.id_user, userId, isOpen, isInitialized]);
 
   const formatHistoryDate = (dateString: string) => {
@@ -223,7 +230,7 @@ export default function Historial({ user }: HistorialProps) {
           </button>
         </div>
 
-        <div className="h-[calc(100%-60px)] overflow-y-auto scrollbar-custom p-4">
+        <div className="h-[calc(100vh-64px)] overflow-y-auto scrollbar-custom p-4">
           {isOpen && (
             <>
               <div className="mb-4 space-y-3">

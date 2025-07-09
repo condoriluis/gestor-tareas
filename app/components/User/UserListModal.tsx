@@ -4,6 +4,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { MdClose, MdEmail, MdCancel, MdOutlinePeople, MdOutlineAssignment, MdPersonAdd, MdEdit, MdAdd } from 'react-icons/md';
 import { showToast } from '@/utils/toastMessages';
 import { formatDate } from '@/utils/dateService';
+import { User } from '@/utils/types';
 import { useRouter } from 'next/navigation';
 import { useTaskUser } from '@/app/context/TaskUserContext';
 import EditUser from './EditUser';
@@ -12,15 +13,6 @@ import PaginationControls from './PaginationControls';
 import UserTable from './UserTable';
 import DeleteUser from './DeleteUser';
 import AddUser from './AddUser';
-
-export type User = {
-  id_user: number;
-  name_user: string;
-  email_user: string;
-  rol_user: string;
-  status_user: number;
-  date_created_user: string;
-};
 
 export type SortConfig = {
   key: keyof User;

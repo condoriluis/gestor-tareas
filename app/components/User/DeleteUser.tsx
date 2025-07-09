@@ -1,7 +1,7 @@
 'use client';
 
 import { showToast } from '@/utils/toastMessages';
-import { User } from './UserListModal';
+import { User } from '@/utils/types';
 import { MdWarning } from 'react-icons/md';
 import { FiTrash2 } from 'react-icons/fi';
 

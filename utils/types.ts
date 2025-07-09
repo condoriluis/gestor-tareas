@@ -23,3 +23,12 @@ export interface TaskHistory {
   date_created_history: string;
   date_updated_history: string;
 }
+
+export interface User {
+  id_user: number;
+  name_user: string;
+  email_user: string;
+  rol_user: string;
+  status_user: number;
+  date_created_user: string;
+}

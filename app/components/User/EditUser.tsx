@@ -1,17 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { MdClose, MdOutlineSave } from 'react-icons/md';
 import { showToast } from '@/utils/toastMessages';
-
-type User = {
-  id_user: number;
-  name_user: string;
-  email_user: string;
-  rol_user: string;
-  status_user: number;
-  date_created_user: string;
-};
+import { User } from '@/utils/types';
 
 type EditUserProps = {
   user: User;
