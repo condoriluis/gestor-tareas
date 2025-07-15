@@ -51,8 +51,25 @@ const swaggerDefinition = {
 const options = {
   swaggerDefinition,
   apis: [
-    resolve(process.cwd(), 'app/api/**/route.ts')
+    resolve(process.cwd(), 'app/api/**/route.ts'),
+    resolve(process.cwd(), 'app/api/**/route.js')
   ]
+};
+
+export const swaggerConfig = {
+  swaggerOptions: {
+    explorer: true,
+    swaggerOptions: {
+      validatorUrl: null,
+      urls: [
+        {
+          url: '/api-docs/json',
+          name: 'API Gestor de Tareas'
+        }
+      ]
+    }
+  },
+  exposeRoute: process.env.NODE_ENV !== 'production' || process.env.ENABLE_SWAGGER === 'true'
 };
 
 export const swaggerSpec = options;
