@@ -3,7 +3,6 @@ import { validateToken } from '@/utils/validateToken'
 import { TaskService } from '../TaskService';
 import { UserService } from '../../auth/UserService';
 import { TaskHistoryService } from '../../tasks/TaskHistoryService';
-import { toBoliviaDateTime } from '@/utils/dateService';
 
 // Obtener una tarea por ID (GET /api/tasks/[id])
 export const GET = async (request: Request, { params }: { params: Promise<{ id: string }> }) => {
@@ -46,49 +45,34 @@ export const PUT = async (request: Request, { params }: { params: Promise<{ id: 
       return NextResponse.json({ message: 'ID de tarea es necesario' }, { status: 400 });
     }
 
-    const body = await request.json();
-    const { type } = body;
-
-    if (!type) {
-      return NextResponse.json({ message: 'El campo type es obligatorio' }, { status: 400 });
-    }
-
     const user = await UserService.getUserById(session.id_user);
 
-    if (type === 'edit') {
-      const { title, description, priority, 
-        old_status, new_status, action_history, description_history } = body; 
-        
-      await TaskService.updateTask(session.id_user, user.rol_user, parseInt(id), title, description, priority);
-      await TaskHistoryService.createTaskHistory(parseInt(id), session.id_user, old_status, new_status, action_history, description_history);
+    const body = await request.json();
+    const { title, description, priority } = body; 
+
+    let prioridad = '';
+    let action_history = '';
+    let description_history = '';
+    let old_status = '';
+    let new_status = '';
     
-    } 
-    else if (type === 'status') {
-      const { status, date_start, date_completed,
-        old_status, new_status, action_history, description_history } = body;
-
-      const validatedDateStart = date_start 
-        ? (typeof date_start === 'string' && date_start.includes('T')
-            ? toBoliviaDateTime(date_start)
-            : date_start)
-        : null;
-        
-      const validatedDateCompleted = date_completed
-        ? (typeof date_completed === 'string' && date_completed.includes('T')
-            ? toBoliviaDateTime(date_completed)
-            : date_completed)
-        : null;
-
-      await TaskService.updateTaskStatus(session.id_user, user.rol_user, parseInt(id), status, validatedDateStart, validatedDateCompleted);
-      await TaskHistoryService.createTaskHistory(parseInt(id), session.id_user, old_status, new_status, action_history, description_history);
-    } 
-
-    else {
-      return NextResponse.json({ message: 'Tipo de operación inválido' }, { status: 400 });
+    if (priority === 'low') {
+      prioridad = 'Baja';
+    }
+    if (priority === 'medium') {
+      prioridad = 'Media';
+    }
+    if (priority === 'high') {
+      prioridad = 'Alta';
     }
 
+    action_history = 'Tarea editada';
+    description_history = `${title} con prioridad: ${prioridad}`;
+      
+    await TaskService.updateTask(session.id_user, user.rol_user, parseInt(id), title, description, priority);
+    await TaskHistoryService.createTaskHistory(parseInt(id), session.id_user, old_status, new_status, action_history, description_history);
+    
     const updatedTask = await TaskService.getTaskById(parseInt(id));
-
     return NextResponse.json(updatedTask, { status: 200 });
 
   } catch (error) {
@@ -114,7 +98,37 @@ export const DELETE = async (request: Request, { params }: { params: Promise<{ i
     }
 
     const body = await request.json();
-    const { old_status, new_status, action_history, description_history } = body;
+    const { titleTask, priorityTask, statusTask } = body;
+
+    let prioridad = '';
+    let estado = '';
+    let action_history = '';
+    let description_history = '';
+    let old_status = '';
+    let new_status = '';
+    
+    if (priorityTask === 'low') {
+      prioridad = 'Baja';
+    }
+    if (priorityTask === 'medium') {
+      prioridad = 'Media';
+    }
+    if (priorityTask === 'high') {
+      prioridad = 'Alta';
+    }
+    
+    if (statusTask === 'todo') {
+      estado = 'To-do';
+    }
+    if (statusTask === 'in_progress') {
+      estado = 'En progreso';
+    }
+    if (statusTask === 'done') {
+      estado = 'Completado';
+    }
+
+    action_history = 'Tarea eliminada';
+    description_history = `${titleTask} con prioridad: ${prioridad}, estado: ${estado} y ID: ${id}`;
    
     const deletedRows = await TaskService.deleteTask(parseInt(id));
 

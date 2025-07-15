@@ -64,13 +64,17 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onUpdate, onDeleteSuccess, on
       const response = await fetch(`/api/tasks/${task.id_task}`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ old_status: '', new_status: '', action_history: 'Tarea eliminada', description_history: `${task.title_task} con ID: ${task.id_task}` }),
+        body: JSON.stringify({ 
+          titleTask: task.title_task,
+          priorityTask: task.priority_task,
+          statusTask: task.status_task,
+        }),
       });
 
       if (!response.ok) throw new Error('Error al eliminar tarea');
       
       window.dispatchEvent(new Event('history-refresh'));
-      showToast('Tarea eliminada correctamente', 'success');
+      showToast('Tarea eliminada correctamente.', 'success');
       onDeleteSuccess(task.id_task);
     } catch (error) {
       showToast('No se pudo eliminar la tarea.', 'error');

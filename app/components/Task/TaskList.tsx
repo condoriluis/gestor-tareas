@@ -154,7 +154,6 @@ const TaskList: React.FC<TaskListProps> = () => {
   
     let dateStart = null;
     let dateCompleted = null;
-    let prioridad = '';
 
     if (newStatus === 'todo') {
       dateStart = null;
@@ -176,42 +175,27 @@ const TaskList: React.FC<TaskListProps> = () => {
       dateCompleted = nowBolivia();
     }
 
-    if (priority === 'low') {
-      prioridad = 'Baja';
-    }
-    if (priority === 'medium') {
-      prioridad = 'Media';
-    }
-    if (priority === 'high') {
-      prioridad = 'Alta';
-    }
-
     const taskData = {
+      idTask: taskId,
       status: newStatus,
       title,
       priority,
       date_start: dateStart,
       date_completed: dateCompleted,
-      old_status: status_old,
-      new_status: newStatus,
-      action_history: 'Estado cambiado',
-      description_history: `Tarea: ${title} con prioridad: ${prioridad}`
+      old_status: status_old
     };
 
     try {
-      const response = await fetch(`/api/tasks/${taskId}`, {
-        method: "PUT",
+      const response = await fetch(`/api/tasks`, {
+        method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          type: 'status',
-          ...taskData
-        }),
+        body: JSON.stringify({ ...taskData }),
       });
 
       if (!response.ok) throw new Error('Error al actualizar tarea');
       
       window.dispatchEvent(new Event('history-refresh'));
-      showToast('Estado actualizado correctamente', 'success');
+      showToast('Estado actualizado correctamente.', 'success');
 
       const updatedTask = await response.json();
       setTasks(prevTasks => 

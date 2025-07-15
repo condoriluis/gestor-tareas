@@ -35,16 +35,7 @@ const EditTask: React.FC<EditTaskProps> = ({
       return;
     }
 
-    let prioridad = "";
-    if (priority.trim() === "low") {
-      prioridad = "Baja";
-    }
-    if (priority.trim() === "medium") {
-      prioridad = "Media";
-    }
-    if (priority.trim() === "high") {
-      prioridad = "Alta";
-    }
+    
 
     setIsLoading(true);
     try {
@@ -52,15 +43,9 @@ const EditTask: React.FC<EditTaskProps> = ({
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
-          type: 'edit', 
           title, 
           description, 
           priority,
-
-          old_status: '',
-          new_status: '',
-          action_history: 'Tarea editada',
-          description_history: title+' con prioridad: '+prioridad,
         }),
       });
 
@@ -68,7 +53,7 @@ const EditTask: React.FC<EditTaskProps> = ({
 
       const updatedTask = await response.json();
       if (response.ok) {
-        showToast('Tarea actualizada correctamente', 'success');
+        showToast('Tarea actualizada correctamente.', 'success');
         onSuccess(updatedTask);
         window.dispatchEvent(new Event('history-refresh'));
       }
