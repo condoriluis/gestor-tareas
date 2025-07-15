@@ -4,8 +4,9 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { showToast } from "@/utils/toastMessages";
-import { MdEmail, MdLock, MdLogin, MdVisibility, MdVisibilityOff } from 'react-icons/md';
+import { MdEmail, MdLock, MdLogin, MdVisibility, MdVisibilityOff, MdInfoOutline } from 'react-icons/md';
 import { useAuth } from '../../context/AuthContext';
+import { AboutModal } from '../AboutModal';
 
 export default function LoginForm() {
   const [email, setEmail] = useState('');
@@ -13,6 +14,7 @@ export default function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [rememberEmail, setRememberEmail] = useState(false);
+  const [isAboutModalOpen, setIsAboutModalOpen] = useState(false);
   const router = useRouter();
   const { login } = useAuth();
 
@@ -79,92 +81,103 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        <div className="bg-[#2A2A2A] rounded-xl shadow-lg overflow-hidden border border-gray-600">
-          <div className="p-8 sm:p-10">
-            
-            <h2 className="text-2xl font-bold text-center text-white mb-6">Iniciar Sesión</h2>
-            
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <MdEmail className="text-gray-400" />
-                </div>
-                <input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 bg-[#2A2A2A] border-b border-gray-600 focus:border-[#00E57B] focus:outline-none text-white placeholder-gray-400"
-                  placeholder="Correo electrónico"
-                />
-              </div>
-
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <MdLock className="text-gray-400" />
-                </div>
-                <input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-10 pr-10 py-3 bg-[#2A2A2A] border-b border-gray-600 focus:border-[#00E57B] focus:outline-none text-white placeholder-gray-400"
-                  placeholder="Contraseña"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-white"
-                >
-                  {showPassword ? <MdVisibility /> : <MdVisibilityOff />}
-                </button>
-              </div>
-
-              <div className="flex items-center justify-between mt-4">
-                <div className="flex items-center">
+    <>
+      <AboutModal isOpen={isAboutModalOpen} onClose={() => setIsAboutModalOpen(false)} />
+      
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <div className="w-full max-w-md">
+          <div className="bg-[#2A2A2A] rounded-xl shadow-lg overflow-hidden border border-gray-600">
+            <div className="p-8 sm:p-10">
+              <button 
+                onClick={() => setIsAboutModalOpen(true)}
+                className="absolute top-4 left-4 text-gray-300 hover:text-white transition-colors"
+                title="Acerca del proyecto"
+              >
+                <MdInfoOutline size={24} />
+              </button>
+              
+              <h2 className="text-2xl font-bold text-center text-white mb-6">Iniciar Sesión</h2>
+              
+              <form onSubmit={handleSubmit} className="space-y-5">
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <MdEmail className="text-gray-400" />
+                  </div>
                   <input
-                    id="remember-email"
-                    type="checkbox"
-                    checked={rememberEmail}
-                    onChange={(e) => setRememberEmail(e.target.checked)}
-                    className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full pl-10 pr-4 py-3 bg-[#2A2A2A] border-b border-gray-600 focus:border-[#00E57B] focus:outline-none text-white placeholder-gray-400"
+                    placeholder="Correo electrónico"
                   />
-                  <label htmlFor="remember-email" className="ml-2 text-sm text-gray-300">
-                    Recordar ingreso
-                  </label>
                 </div>
-                <div className="flex items-center">
-                  <a href="/forgot-password" className="text-sm text-blue-500 hover:text-blue-500 cursor-pointer">
-                    ¿Olvidaste tu contraseña?
-                  </a>
+
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <MdLock className="text-gray-400" />
+                  </div>
+                  <input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full pl-10 pr-10 py-3 bg-[#2A2A2A] border-b border-gray-600 focus:border-[#00E57B] focus:outline-none text-white placeholder-gray-400"
+                    placeholder="Contraseña"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-white"
+                  >
+                    {showPassword ? <MdVisibility /> : <MdVisibilityOff />}
+                  </button>
                 </div>
-              </div>
 
-              <div>
-                <button
-                  type="submit"
-                  disabled={isLoading}
-                  className="w-full flex justify-center items-center gap-2 py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-[#00E57B] hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#00E57B] disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
-                >
-                  <MdLogin size={18} />
-                  {isLoading ? 'Iniciando sesión...' : 'Iniciar sesión'}
-                </button>
-              </div>
-            </form>
+                <div className="flex items-center justify-between mt-4">
+                  <div className="flex items-center">
+                    <input
+                      id="remember-email"
+                      type="checkbox"
+                      checked={rememberEmail}
+                      onChange={(e) => setRememberEmail(e.target.checked)}
+                      className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                    />
+                    <label htmlFor="remember-email" className="ml-2 text-sm text-gray-300">
+                      Recordar ingreso
+                    </label>
+                  </div>
+                  <div className="flex items-center">
+                    <a href="/forgot-password" className="text-sm text-blue-500 hover:text-blue-500 cursor-pointer">
+                      ¿Olvidaste tu contraseña?
+                    </a>
+                  </div>
+                </div>
 
-            <div className="mt-6 text-center">
-              <p className="text-sm text-gray-600">
-                ¿No tienes una cuenta?{' '}
-                <Link href="/register" className="font-medium text-[#00E57B] hover:text-teal-600 transition-colors">
-                  Regístrate aquí
-                </Link>
-              </p>
+                <div>
+                  <button
+                    type="submit"
+                    disabled={isLoading}
+                    className="w-full flex justify-center items-center gap-2 py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-[#00E57B] hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#00E57B] disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                  >
+                    <MdLogin size={18} />
+                    {isLoading ? 'Iniciando sesión...' : 'Iniciar sesión'}
+                  </button>
+                </div>
+              </form>
+
+              <div className="mt-6 text-center">
+                <p className="text-sm text-gray-600">
+                  ¿No tienes una cuenta?{' '}
+                  <Link href="/register" className="font-medium text-[#00E57B] hover:text-teal-600 transition-colors">
+                    Regístrate aquí
+                  </Link>
+                </p>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

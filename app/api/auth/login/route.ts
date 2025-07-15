@@ -2,6 +2,73 @@ import { NextResponse } from 'next/server';
 import { UserService } from '../UserService';
 import { signJwtAccessToken } from '@/utils/jwt';
 
+/**
+ * @swagger
+ * /api/auth/login:
+ *   post:
+ *     tags: [Autenticación]
+ *     summary: Inicio de sesión de usuario
+ *     description: Autentica un usuario y genera un JWT token de acceso
+ *     operationId: loginUser
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email, password]
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: usuario@ejemplo.com
+ *               password:
+ *                 type: string
+ *                 format: password
+ *                 example: contraseñaSegura123
+ *     responses:
+ *       '200':
+ *         description: Autenticación exitosa
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id_user:
+ *                   type: integer
+ *                   example: 1
+ *                 name_user:
+ *                   type: string
+ *                   example: Nombre usuario
+ *                 email_user:
+ *                   type: string
+ *                   example: usuario@ejemplo.com
+ *                 status_user:
+ *                   type: integer
+ *                   example: 1
+ *                 rol_user:
+ *                   type: string
+ *                   enum: [user, admin]
+ *                   example: user
+ *                 accessToken:
+ *                   type: string
+ *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *       '400':
+ *         description: Datos de entrada inválidos
+ *       '401':
+ *         description: Credenciales inválidas
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Credenciales inválidas.
+ *       '500':
+ *         description: Error del servidor
+ */
+
 export async function POST(request: Request) {
 
   try {
@@ -13,7 +80,7 @@ export async function POST(request: Request) {
     
     if (!user) {
       return NextResponse.json(
-        { error: 'Usuario no encontrado' },
+        { error: 'Credenciales inválidas.' },
         { status: 401 }
       );
     }

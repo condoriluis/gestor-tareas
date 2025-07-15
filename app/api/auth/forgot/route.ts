@@ -1,6 +1,59 @@
 import { NextResponse } from 'next/server'
-import { sendEmail } from '@/utils/mailer'
+import { sendEmail } from '@/utils/mailer';
 import { UserService } from '../UserService';
+
+/**
+ * @swagger
+ * /api/auth/forgot:
+ *   post:
+ *     tags: [Autenticación]
+ *     summary: Recuperación de contraseña
+ *     description: Envía una nueva contraseña temporal al correo electrónico del usuario
+ *     operationId: forgotPassword
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email]
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: usuario@ejemplo.com
+ *     responses:
+ *       '200':
+ *         description: Correo enviado exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Se ha enviado una nueva contraseña a tu correo electrónico.
+ *       '400':
+ *         description: Correo no registrado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: El correo electrónico no existe en el sistema.
+ *       '500':
+ *         description: Error al procesar la solicitud
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Error al enviar el correo electrónico.
+ */
 
 export async function POST(request: Request) {
   const { email } = await request.json()
