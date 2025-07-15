@@ -17,13 +17,13 @@ const swaggerDefinition = {
     }
   },
   servers: [
-    // {
-    //   url: 'http://localhost:3000/',
-    //   description: 'Servidor de Desarrollo (Local)'
-    // }
     {
-      url: 'https://gestor-tareas-luis.vercel.app/',
-      description: 'Servidor de Producción'
+      url: process.env.NODE_ENV === 'development' 
+        ? 'http://localhost:3000/' 
+        : 'https://gestor-tareas-luis.vercel.app/',
+      description: process.env.NODE_ENV === 'development' 
+        ? 'Servidor de Desarrollo (Local)' 
+        : 'Servidor de Producción'
     }
   ],
   components: {
