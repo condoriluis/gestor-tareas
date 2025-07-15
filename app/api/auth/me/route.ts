@@ -3,21 +3,23 @@ import { verifyJwt } from '@/utils/jwt';
 import { NextRequest } from 'next/server';
 
 export async function GET(request: NextRequest) {
-  const accessToken = request.cookies.get('token')?.value;
   
-  if (!accessToken) {
-    return NextResponse.json(
-      { error: 'No autorizado.' },
-      { status: 401 }
-    );
-  }
-
   try {
-    const user = await verifyJwt(accessToken);
+
+    const token = request.cookies.get('token')?.value;
+  
+    if (!token) {
+      return NextResponse.json(
+        { error: 'No autorizado, token no encontrado.' },
+        { status: 401 }
+      );
+    }
+
+    const user = await verifyJwt(token);
     
     if (!user) {
       return NextResponse.json(
-        { error: 'El token es inválido.' },
+        { error: 'Token inválido, o expirado.' },
         { status: 401 }
       );
     }

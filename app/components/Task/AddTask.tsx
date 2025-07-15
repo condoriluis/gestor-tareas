@@ -32,17 +32,6 @@ const AddTask: React.FC<AddTaskProps> = ({ onCreate, onCancel }) => {
       return;
     }
 
-    let priority = "";
-    if (newTask.priority_task.trim() === "low") {
-      priority = "Baja";
-    }
-    if (newTask.priority_task.trim() === "medium") {
-      priority = "Media";
-    }
-    if (newTask.priority_task.trim() === "high") {
-      priority = "Alta";
-    }
-
     try {
       const response = await fetch('/api/tasks/create', {
         method: 'POST',
@@ -54,11 +43,6 @@ const AddTask: React.FC<AddTaskProps> = ({ onCreate, onCancel }) => {
           status_task: newTask.status_task,
           date_start_task: newTask.date_start_task,
           date_completed_task: newTask.date_completed_task,
-  
-          old_status: '',
-          new_status: '',
-          action_history: 'Tarea creada',
-          description_history: newTask.title_task+' con prioridad: '+priority,
         }),
       });
 

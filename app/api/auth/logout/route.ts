@@ -9,9 +9,11 @@ export async function POST() {
     
     response.cookies.set({
       name: 'token',
+      httpOnly: true,
       value: '',
       expires: new Date(0),
       path: '/',
+      maxAge: 0,
     });
     
     return response;

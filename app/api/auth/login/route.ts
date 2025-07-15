@@ -3,9 +3,12 @@ import { UserService } from '../UserService';
 import { signJwtAccessToken } from '@/utils/jwt';
 
 export async function POST(request: Request) {
-  const { email, password } = await request.json();
-  
+
   try {
+
+    const body = await request.json();
+    const { email, password } = body;
+
     const user = await UserService.getUserByEmail(email);
     
     if (!user) {
@@ -29,7 +32,7 @@ export async function POST(request: Request) {
     
     const response = NextResponse.json({
       ...userWithoutPass,
-      accessToken
+      accessToken,
     });
     
     response.cookies.set('token', accessToken, {

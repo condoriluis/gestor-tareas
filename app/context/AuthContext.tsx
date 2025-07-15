@@ -26,18 +26,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     async function loadUser() {
       try {
-        const res = await fetch('/api/auth/me', {
+        const response = await fetch('/api/auth/me', {
           credentials: 'include',
         });
         
-        if (res.ok) {
-          const userData = await res.json();
+        if (response.ok) {
+          const userData = await response.json();
           setUser(userData);
-        } else if (res.status !== 401) {
-         
+        } else if (response.status !== 401) {
+          setUser(null);
         }
       } catch (error) {
-        
+        setUser(null);
       } finally {
         setIsLoading(false);
       }
@@ -47,30 +47,41 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = async (email: string, password: string) => {
-    const res = await fetch('/api/auth/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email, password }),
-      credentials: 'include',
-    });
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+        credentials: 'include',
+      });
 
-    if (res.ok) {
-      const userData = await res.json();
-      setUser(userData);
-    } else {
-      throw new Error('Login fallido.');
+      if (response.ok) {
+        const userData = await response.json();
+        setUser(userData);
+      } else {
+        throw new Error('Login fallido.');
+      }
+    } catch (error) {
+      throw new Error('Error al iniciar sesión');
     }
   };
 
   const logout = async () => {
-    await fetch('/api/auth/logout', {
-      method: 'POST',
-      credentials: 'include',
-    });
-    setUser(null);
-    router.push('/login');
+    try {
+      const response = await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include',
+      });
+      
+      if (response.ok) {
+        setUser(null);
+        router.push('/login');
+      }
+    } catch (error) {
+      throw new Error('Error al cerrar sesión');
+    }
   };
 
   return (
