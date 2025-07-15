@@ -18,13 +18,8 @@ const swaggerDefinition = {
   },
   servers: [
     {
-      url: process.env.NODE_ENV === 'development' 
-        ? 'http://localhost:3000/' 
-        : 'https://gestor-tareas-luis.vercel.app/',
-      description: process.env.NODE_ENV === 'development' 
-        ? 'Servidor de Desarrollo (Local)' 
-        : 'Servidor de Producción'
-    }
+      url: process.env.NODE_ENV === 'production' ? 'https://gestor-tareas-luis.vercel.app' : 'http://localhost:3000',
+    },
   ],
   components: {
     securitySchemes: {
@@ -51,25 +46,8 @@ const swaggerDefinition = {
 const options = {
   swaggerDefinition,
   apis: [
-    resolve(process.cwd(), 'app/api/**/route.ts'),
-    resolve(process.cwd(), 'app/api/**/route.js')
+    resolve(process.cwd(), 'app/api/**/*route.ts'),
   ]
-};
-
-export const swaggerConfig = {
-  swaggerOptions: {
-    explorer: true,
-    swaggerOptions: {
-      validatorUrl: null,
-      urls: [
-        {
-          url: '/api-docs/json',
-          name: 'API Gestor de Tareas'
-        }
-      ]
-    }
-  },
-  exposeRoute: process.env.NODE_ENV !== 'production' || process.env.ENABLE_SWAGGER === 'true'
 };
 
 export const swaggerSpec = options;
