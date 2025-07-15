@@ -8,7 +8,7 @@ const swaggerDefinition = {
     description: 'API completa para gestión de tareas con autenticación JWT y roles de usuario',
     contact: {
       name: 'Desarrollador',
-      email: 'luis.condori.dev@gmail.com',
+      email: 'condori.luis.dev@gmail.com',
       url: 'https://github.com/condoriluis'
     },
     license: {
@@ -17,9 +17,13 @@ const swaggerDefinition = {
     }
   },
   servers: [
+    // {
+    //   url: 'http://localhost:3000/',
+    //   description: 'Servidor de Desarrollo (Local)'
+    // }
     {
-      url: 'http://localhost:3000/',
-      description: 'Servidor de Desarrollo (Local)'
+      url: 'https://gestor-tareas-luis.vercel.app/',
+      description: 'Servidor de Producción'
     }
   ],
   components: {
