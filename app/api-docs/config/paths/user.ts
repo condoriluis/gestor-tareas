@@ -35,10 +35,8 @@ export const userPaths = {
                 description: 'Error al obtener usuarios'
             }
             }
-        }
-    },
+        },
 
-    '/api/users/{idUser}': {
         patch: {
             tags: ['Usuarios'],
             summary: 'Actualizar estado de usuario',
@@ -80,10 +78,8 @@ export const userPaths = {
                 description: 'Error al actualizar el estado'
             }
             }
-        }
-    },
+        },
 
-    '/api/users/{userId}': {
         put: {
             tags: ['Usuarios'],
             summary: 'Actualizar datos de usuario',
@@ -135,10 +131,8 @@ export const userPaths = {
                 description: 'Error al actualizar datos'
             }
             }
-        }
-    },
+        },
 
-    '/api/users/{idDelete}': {
         delete: {
             tags: ['Usuarios'],
             summary: 'Eliminar usuario',
@@ -175,6 +169,6 @@ export const userPaths = {
             }
             }
         }
-    }
+    },
 
 };

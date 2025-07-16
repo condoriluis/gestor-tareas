@@ -1,207 +1,205 @@
 export const taskPaths = {
     '/api/tasks': {
         get: {
-        tags: ['Tareas'],
-        summary: 'Obtener todas las tareas del usuario autenticado',
-        description: 'Devuelve la lista de tareas del usuario autenticado',
-        operationId: 'getAllTasks',
-        security: [{ bearerAuth: [] }],
-        responses: {
-            '200': {
-            description: 'Tareas obtenidas correctamente',
-            content: {
+            tags: ['Tareas'],
+            summary: 'Obtener todas las tareas del usuario autenticado',
+            description: 'Devuelve la lista de tareas del usuario autenticado',
+            operationId: 'getAllTasks',
+            security: [{ bearerAuth: [] }],
+            responses: {
+                '200': {
+                description: 'Tareas obtenidas correctamente',
+                content: {
+                    'application/json': {
+                    schema: {
+                        type: 'array',
+                        items: {
+                        type: 'object',
+                        properties: {
+                            id_task: { type: 'integer', example: 1 },
+                            id_user_task: { type: 'integer', example: 1 },
+                            title_task: { type: 'string', example: 'Reunión con equipo' },
+                            description_task: { type: 'string', example: 'Reunión para discutir proyectos' },
+                            status_task: {
+                            type: 'string',
+                            enum: ['todo', 'in_progress', 'done'],
+                            example: 'todo'
+                            },
+                            priority_task: {
+                            type: 'string',
+                            enum: ['low', 'medium', 'high'],
+                            example: 'medium'
+                            },
+                            date_start_task: {
+                            type: 'string',
+                            format: 'date-time',
+                            example: '2025-01-01T09:00:00Z'
+                            },
+                            date_completed_task: {
+                            type: 'string',
+                            format: 'date-time',
+                            example: '2025-01-02T17:00:00Z'
+                            },
+                            date_created_task: {
+                            type: 'string',
+                            format: 'date-time',
+                            example: '2025-01-01T09:00:00Z'
+                            },
+                            user_name: { type: 'string', example: 'Nombre usuario' }
+                        }
+                        }
+                    }
+                    }
+                }
+                },
+                '401': {
+                description: 'No autorizado'
+                },
+                '500': {
+                description: 'Error del servidor'
+                }
+            }
+        },
+
+        patch: {
+            tags: ['Tareas'],
+            summary: 'Actualizar el estado de una tarea',
+            description: 'Permite actualizar el estado de una tarea',
+            operationId: 'updateTaskStatus',
+            security: [{ bearerAuth: [] }],
+            requestBody: {
+                required: true,
+                content: {
                 'application/json': {
-                schema: {
-                    type: 'array',
-                    items: {
+                    schema: {
                     type: 'object',
+                    required: ['idTask'],
                     properties: {
-                        id_task: { type: 'integer', example: 1 },
-                        id_user_task: { type: 'integer', example: 1 },
-                        title_task: { type: 'string', example: 'Reunión con equipo' },
-                        description_task: { type: 'string', example: 'Reunión para discutir proyectos' },
-                        status_task: {
+                        idTask: {
+                        type: 'integer',
+                        example: 0
+                        },
+                        title: {
+                        type: 'string',
+                        example: 'Tarea 1'
+                        },
+                        priority: {
+                        type: 'string',
+                        enum: ['low', 'medium', 'high'],
+                        example: 'medium'
+                        },
+                        old_status: {
+                        type: 'string',
+                        example: 'todo'
+                        },
+                        status: {
                         type: 'string',
                         enum: ['todo', 'in_progress', 'done'],
-                        example: 'todo'
+                        example: 'in_progress'
+                        },
+                        date_start: {
+                        type: 'string',
+                        format: 'date-time',
+                        example: '2025-01-01T10:00:00.000Z'
+                        },
+                        date_completed: {
+                        type: 'string',
+                        format: 'date-time',
+                        example: null
+                        }
+                    }
+                    }
+                }
+                }
+            },
+            responses: {
+                '200': {
+                description: 'Tarea actualizada exitosamente'
+                },
+                '401': {
+                description: 'No autorizado'
+                },
+                '500': {
+                description: 'Error al actualizar el estado de la tarea'
+                }
+            }
+        }
+    },
+
+    '/api/tasks/create': {
+        post: {
+            tags: ['Tareas'],
+            summary: 'Crear una nueva tarea',
+            description: 'Crea una nueva tarea en el sistema',
+            operationId: 'createTask',
+            security: [{ bearerAuth: [] }],
+            requestBody: {
+                required: true,
+                content: {
+                'application/json': {
+                    schema: {
+                    type: 'object',
+                    required: ['title_task', 'description_task', 'priority_task', 'status_task'],
+                    properties: {
+                        title_task: {
+                        type: 'string',
+                        example: 'Reunión de equipo'
+                        },
+                        description_task: {
+                        type: 'string',
+                        example: 'Discutir los objetivos del sprint'
                         },
                         priority_task: {
                         type: 'string',
                         enum: ['low', 'medium', 'high'],
                         example: 'medium'
                         },
+                        status_task: {
+                        type: 'string',
+                        enum: ['todo', 'in_progress', 'done'],
+                        example: 'todo'
+                        },
                         date_start_task: {
                         type: 'string',
                         format: 'date-time',
-                        example: '2025-01-01T09:00:00Z'
+                        example: null
                         },
                         date_completed_task: {
                         type: 'string',
                         format: 'date-time',
-                        example: '2025-01-02T17:00:00Z'
-                        },
-                        date_created_task: {
-                        type: 'string',
-                        format: 'date-time',
-                        example: '2025-01-01T09:00:00Z'
-                        },
+                        example: null
+                        }
+                    }
+                    }
+                }
+                }
+            },
+            responses: {
+                '201': {
+                description: 'Tarea creada exitosamente',
+                content: {
+                    'application/json': {
+                    schema: {
+                        type: 'object',
+                        properties: {
+                        id_task: { type: 'integer', example: 1 },
+                        id_user_task: { type: 'integer', example: 1 },
+                        title_task: { type: 'string', example: 'Tarea de ejemplo' },
+                        description_task: { type: 'string', example: 'Descripción de ejemplo' },
+                        priority_task: { type: 'string', enum: ['low', 'medium', 'high'], example: 'medium' },
+                        status_task: { type: 'string', enum: ['todo', 'in_progress', 'done'], example: 'todo' },
+                        date_start_task: { type: 'string', format: 'date-time', example: null },
+                        date_completed_task: { type: 'string', format: 'date-time', example: null },
+                        date_created_task: { type: 'string', format: 'date-time', example: '2025-01-01T09:00:00.000Z' },
                         user_name: { type: 'string', example: 'Nombre usuario' }
+                        }
                     }
                     }
                 }
-                }
+                },
+                '401': { description: 'No autorizado' },
+                '500': { description: 'Error del servidor' }
             }
-            },
-            '401': {
-            description: 'No autorizado'
-            },
-            '500': {
-            description: 'Error del servidor'
-            }
-        }
-        }
-    },
-
-    '/api/tasks/create': {
-        post: {
-        tags: ['Tareas'],
-        summary: 'Crear una nueva tarea',
-        description: 'Crea una nueva tarea en el sistema',
-        operationId: 'createTask',
-        security: [{ bearerAuth: [] }],
-        requestBody: {
-            required: true,
-            content: {
-            'application/json': {
-                schema: {
-                type: 'object',
-                required: ['title_task', 'description_task', 'priority_task', 'status_task'],
-                properties: {
-                    title_task: {
-                    type: 'string',
-                    example: 'Reunión de equipo'
-                    },
-                    description_task: {
-                    type: 'string',
-                    example: 'Discutir los objetivos del sprint'
-                    },
-                    priority_task: {
-                    type: 'string',
-                    enum: ['low', 'medium', 'high'],
-                    example: 'medium'
-                    },
-                    status_task: {
-                    type: 'string',
-                    enum: ['todo', 'in_progress', 'done'],
-                    example: 'todo'
-                    },
-                    date_start_task: {
-                    type: 'string',
-                    format: 'date-time',
-                    example: null
-                    },
-                    date_completed_task: {
-                    type: 'string',
-                    format: 'date-time',
-                    example: null
-                    }
-                }
-                }
-            }
-            }
-        },
-        responses: {
-            '201': {
-            description: 'Tarea creada exitosamente',
-            content: {
-                'application/json': {
-                schema: {
-                    type: 'object',
-                    properties: {
-                    id_task: { type: 'integer', example: 1 },
-                    id_user_task: { type: 'integer', example: 1 },
-                    title_task: { type: 'string', example: 'Tarea de ejemplo' },
-                    description_task: { type: 'string', example: 'Descripción de ejemplo' },
-                    priority_task: { type: 'string', enum: ['low', 'medium', 'high'], example: 'medium' },
-                    status_task: { type: 'string', enum: ['todo', 'in_progress', 'done'], example: 'todo' },
-                    date_start_task: { type: 'string', format: 'date-time', example: null },
-                    date_completed_task: { type: 'string', format: 'date-time', example: null },
-                    date_created_task: { type: 'string', format: 'date-time', example: '2025-01-01T09:00:00.000Z' },
-                    user_name: { type: 'string', example: 'Nombre usuario' }
-                    }
-                }
-                }
-            }
-            },
-            '401': { description: 'No autorizado' },
-            '500': { description: 'Error del servidor' }
-        }
-        }
-    },
-
-    '/api/tasks/{idTask}': {
-        patch: {
-        tags: ['Tareas'],
-        summary: 'Actualizar el estado de una tarea',
-        description: 'Permite actualizar el estado de una tarea',
-        operationId: 'updateTaskStatus',
-        security: [{ bearerAuth: [] }],
-        requestBody: {
-            required: true,
-            content: {
-            'application/json': {
-                schema: {
-                type: 'object',
-                required: ['idTask'],
-                properties: {
-                    idTask: {
-                    type: 'integer',
-                    example: 0
-                    },
-                    title: {
-                    type: 'string',
-                    example: 'Tarea 1'
-                    },
-                    priority: {
-                    type: 'string',
-                    enum: ['low', 'medium', 'high'],
-                    example: 'medium'
-                    },
-                    old_status: {
-                    type: 'string',
-                    example: 'todo'
-                    },
-                    status: {
-                    type: 'string',
-                    enum: ['todo', 'in_progress', 'done'],
-                    example: 'in_progress'
-                    },
-                    date_start: {
-                    type: 'string',
-                    format: 'date-time',
-                    example: '2025-01-01T10:00:00.000Z'
-                    },
-                    date_completed: {
-                    type: 'string',
-                    format: 'date-time',
-                    example: null
-                    }
-                }
-                }
-            }
-            }
-        },
-        responses: {
-            '200': {
-            description: 'Tarea actualizada exitosamente'
-            },
-            '401': {
-            description: 'No autorizado'
-            },
-            '500': {
-            description: 'Error al actualizar el estado de la tarea'
-            }
-        }
         }
     },
 
@@ -275,11 +273,8 @@ export const taskPaths = {
             401: { description: 'No autorizado' },
             500: { description: 'Error al actualizar la tarea' }
             }
-        }
         },
 
-
-    '/api/tasks/{idUser}': {
         get: {
             tags: ['Tareas'],
             summary: 'Obtener tareas por ID de usuario',
@@ -289,7 +284,7 @@ export const taskPaths = {
             parameters: [
             {
                 in: 'path',
-                name: 'idUser',
+                name: 'id',
                 required: true,
                 schema: {
                 type: 'integer'
@@ -323,19 +318,18 @@ export const taskPaths = {
             401: { description: 'No autorizado' },
             500: { description: 'Error interno del servidor' }
             }
-        }
-    },
+        },
 
-    '/api/tasks/{idDelete}': {
         delete: {
             tags: ['Tareas'],
             summary: 'Eliminar una tarea',
             description: 'Endpoint para eliminar una tarea existente',
+            operationId: 'deleteTask',
             security: [{ bearerAuth: [] }],
             parameters: [
             {
                 in: 'path',
-                name: 'idDelete',
+                name: 'id',
                 required: true,
                 schema: { type: 'integer' },
                 description: 'ID de la tarea a eliminar'
@@ -372,5 +366,4 @@ export const taskPaths = {
             }
         }
     }
-
 };

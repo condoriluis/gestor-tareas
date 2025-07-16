@@ -86,10 +86,8 @@ export const historyPaths = {
             401: { description: 'No autorizado' },
             500: { description: 'Error al obtener el historial' }
             }
-        }
-    },
+        },
 
-    '/api/history/{idUser}': {
         delete: {
             tags: ['Historial'],
             summary: 'Eliminar historial de tareas',
@@ -99,7 +97,7 @@ export const historyPaths = {
             parameters: [
             {
                 in: 'path',
-                name: 'idUser',
+                name: 'id',
                 required: false,
                 schema: { type: 'integer' },
                 description: 'ID de usuario'
@@ -131,6 +129,5 @@ export const historyPaths = {
             500: { description: 'Error al eliminar el historial' }
             }
         }
-    }
-        
+    }  
 };
