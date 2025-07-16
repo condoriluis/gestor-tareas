@@ -4,55 +4,6 @@ import { TaskService } from '../TaskService';
 import { UserService } from '../../auth/UserService';
 import { TaskHistoryService } from '../../tasks/TaskHistoryService';
 
-/**
- * @swagger
- * /api/tasks/{id}:
- *   get:
- *     tags: [Tareas]
- *     summary: Obtener una tarea por ID de usuario
- *     description: Endpoint para obtener los detalles de una tarea específica por ID de usuario
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *         description: ID de usuario
- *     responses:
- *       200:
- *         description: Detalles de la tarea
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 id_user:
- *                   type: integer
- *                 id_user_task:
- *                   type: integer
- *                 title_task:
- *                   type: string
- *                 description_task:
- *                   type: string
- *                 priority_task:
- *                   type: string
- *                 status_task:
- *                   type: string
- *                 date_start_task:
- *                   type: string
- *                 date_completed_task:
- *                   type: string
- *                 user_name:
- *                   type: string
- *       400:
- *         description: ID de usuario no proporcionado
- *       401:
- *         description: No autorizado
- *       500:
- *         description: Error interno del servidor
- */
 export const GET = async (request: Request, { params }: { params: Promise<{ id: string }> }) => {
 
   const session = await validateToken()
@@ -62,8 +13,9 @@ export const GET = async (request: Request, { params }: { params: Promise<{ id: 
   }
 
   try {
-    const { id } = await params;
 
+    const { id } = (await params); 
+    
     if (!id) {
       return NextResponse.json({ message: 'ID de tarea es necesario' }, { status: 400 });
     }
@@ -77,75 +29,6 @@ export const GET = async (request: Request, { params }: { params: Promise<{ id: 
   }
 }
 
-/**
- * @swagger
- * /api/tasks/{id}:
- *   put:
- *     tags: [Tareas]
- *     summary: Actualizar una tarea
- *     description: Endpoint para actualizar los detalles de una tarea existente
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *         description: ID de la tarea a actualizar
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               title:
- *                 type: string
- *                 description: Nuevo título de la tarea
- *                 example: Reunión actualizada
- *               description:
- *                 type: string
- *                 description: Nueva descripción
- *                 example: Discutir objetivos revisados
- *               priority:
- *                 type: string
- *                 enum: [low, medium, high]
- *                 description: Nueva prioridad
- *                 example: medium
- *     responses:
- *       200:
- *         description: Tarea actualizada exitosamente
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 id_user:
- *                   type: integer
- *                 id_user_task:
- *                   type: integer
- *                 title_task:
- *                   type: string
- *                 description_task:
- *                   type: string
- *                 priority_task:
- *                   type: string
- *                 status_task:
- *                   type: string
- *                 date_start_task:
- *                   type: string
- *                 date_completed_task:
- *                   type: string
- *                 user_name:
- *                   type: string
- *       400:
- *         description: Datos inválidos
- *       401:
- *         description: No autorizado
- *       500:
- *         description: Error al actualizar la tarea
- */
 export const PUT = async (request: Request, { params }: { params: Promise<{ id: string }> }) => {
 
   const session = await validateToken()
@@ -196,45 +79,6 @@ export const PUT = async (request: Request, { params }: { params: Promise<{ id: 
   }
 };
 
-/**
- * @swagger
- * /api/tasks/{id}:
- *   delete:
- *     tags: [Tareas]
- *     summary: Eliminar una tarea
- *     description: Endpoint para eliminar una tarea existente
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *         description: ID de la tarea a eliminar
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               titleTask:
- *                 type: string
- *               priorityTask:
- *                 type: string
- *               statusTask:
- *                 type: string
- *     responses:
- *       204:
- *         description: Tarea eliminada exitosamente
- *       400:
- *         description: ID de tarea no proporcionado
- *       401:
- *         description: No autorizado
- *       500:
- *         description: Error al eliminar la tarea
- */
 export const DELETE = async (request: Request, { params }: { params: Promise<{ id: string }> }) => {
 
   const session = await validateToken()

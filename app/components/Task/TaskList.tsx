@@ -186,7 +186,7 @@ const TaskList: React.FC<TaskListProps> = () => {
     };
 
     try {
-      const response = await fetch(`/api/tasks`, {
+      const response = await fetch(`/api/tasks/${taskId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...taskData }),
