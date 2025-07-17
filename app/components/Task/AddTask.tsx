@@ -16,10 +16,6 @@ const AddTask: React.FC<AddTaskProps> = ({ onCreate, onCancel }) => {
     title_task: '',
     description_task: '',
     priority_task: 'low',
-    status_task: 'todo',
-    date_start_task: null,
-    date_completed_task: null,
-    date_created_task: ''
   });
 
   const handleCreateTask = async () => {
@@ -40,9 +36,6 @@ const AddTask: React.FC<AddTaskProps> = ({ onCreate, onCancel }) => {
           title_task: newTask.title_task,
           description_task: newTask.description_task,
           priority_task: newTask.priority_task,
-          status_task: newTask.status_task,
-          date_start_task: newTask.date_start_task,
-          date_completed_task: newTask.date_completed_task,
         }),
       });
 
@@ -63,10 +56,6 @@ const AddTask: React.FC<AddTaskProps> = ({ onCreate, onCancel }) => {
         title_task: '', 
         description_task: '', 
         priority_task: 'low', 
-        status_task: 'todo', 
-        date_start_task: null,
-        date_completed_task: null,
-        date_created_task: '',
       });
     } catch (error) {
       showToast('No se pudo crear la tarea.', 'error');

@@ -3,7 +3,7 @@ import { useDrag } from 'react-dnd';
 import EditTask from "./EditTask"
 import { Task } from '@/utils/types'
 import { formatDate } from '@/utils/dateService';
-import { MdAccessTime , MdCancel, MdEdit, MdDelete, MdClose, MdInfo } from "react-icons/md";
+import { MdAccessTime , MdCancel, MdEdit, MdDelete, MdClose } from "react-icons/md";
 import { FaCircle } from "react-icons/fa";
 import { showToast } from "@/utils/toastMessages";
 import { FiRefreshCw, FiTrash2 } from "react-icons/fi";
@@ -48,7 +48,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onUpdate, onDeleteSuccess, on
 
   const [{ isDragging }, drag] = useDrag(() => ({
     type: "TASK",
-    item: { id_task: task.id_task, title_task: task.title_task, priority_task: task.priority_task, status_task: task.status_task, date_start_task: task.date_start_task},
+    item: { id_task: task.id_task, title_task: task.title_task, priority_task: task.priority_task, status_task: task.status_task},
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),
@@ -64,11 +64,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onUpdate, onDeleteSuccess, on
       const response = await fetch(`/api/tasks/${task.id_task}`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          titleTask: task.title_task,
-          priorityTask: task.priority_task,
-          statusTask: task.status_task,
-        }),
+        body: JSON.stringify({}),
       });
 
       if (!response.ok) throw new Error('Error al eliminar tarea');
@@ -194,13 +190,13 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onUpdate, onDeleteSuccess, on
 
           <div className="flex items-center space-x-2 mt-1 text-sm">
             <span className="text-gray-500 font-medium">Creado el:</span>
-            <p className="text-gray-700 font-semibold">{formatDate(task.date_created_task)}</p>
+            <p className="text-gray-700 font-semibold">{formatDate(task.date_created_task || '')}</p>
           </div>
 
           {task.status_task === "in_progress" && (
             <div className="flex items-center space-x-2 mt-1 text-sm">
               <span className="text-gray-500 font-medium">Iniciado el:</span>
-              <p className="text-gray-700 font-semibold">{formatDate(task.date_start_task)}</p>
+              <p className="text-gray-700 font-semibold">{formatDate(task.date_start_task || '')}</p>
             </div>
           )}
 
@@ -208,12 +204,12 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onUpdate, onDeleteSuccess, on
             <>
             <div className="flex items-center space-x-2 mt-1 text-sm">
               <span className="text-gray-500 font-medium">Iniciado el:</span>
-              <p className="text-gray-700 font-semibold">{formatDate(task.date_start_task)}</p>
+              <p className="text-gray-700 font-semibold">{formatDate(task.date_start_task || '')}</p>
             </div>
 
             <div className="flex items-center space-x-2 mt-1 text-sm">
               <span className="text-gray-500 font-medium">Completado el:</span>
-              <p className="text-gray-700 font-semibold">{formatDate(task.date_completed_task)}</p>
+              <p className="text-gray-700 font-semibold">{formatDate(task.date_completed_task || '')}</p>
             </div>
             </>
           )}

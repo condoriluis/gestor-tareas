@@ -17,7 +17,7 @@ export const GET = async (request: Request, { params }: { params: Promise<{ id: 
     const { id } = (await params); 
     
     if (!id) {
-      return NextResponse.json({ message: 'ID de tarea es necesario' }, { status: 400 });
+      return NextResponse.json({ message: 'ID de usuario es necesario' }, { status: 400 });
     }
 
     const task = await TaskService.getAllTasks(parseInt(id));
@@ -44,12 +44,19 @@ export const PUT = async (request: Request, { params }: { params: Promise<{ id: 
       return NextResponse.json({ message: 'ID de tarea es necesario' }, { status: 400 });
     }
 
+    const task = await TaskService.getTaskById(parseInt(id));
+
+    if (!task) {
+      return NextResponse.json({ message: `Tarea con ID:${id} no fue encontrada` }, { status: 404 });
+    }
+  
     const user = await UserService.getUserById(session.id_user);
 
     const body = await request.json();
     const { title, description, priority } = body; 
 
     let prioridad = '';
+    let estado = '';
     let action_history = '';
     let description_history = '';
     let old_status = '';
@@ -65,8 +72,18 @@ export const PUT = async (request: Request, { params }: { params: Promise<{ id: 
       prioridad = 'Alta';
     }
 
+    if (task.status_task === 'todo') {
+      estado = 'To-do';
+    }
+    if (task.status_task === 'in_progress') {
+      estado = 'En progreso';
+    }
+    if (task.status_task === 'done') {
+      estado = 'Completado';
+    }
+
     action_history = 'Tarea editada';
-    description_history = `${title} con prioridad: ${prioridad}`;
+    description_history = `${title} con prioridad: ${prioridad} y estado: ${estado}`;
       
     await TaskService.updateTask(session.id_user, user.rol_user, parseInt(id), title, description, priority);
     await TaskHistoryService.createTaskHistory(parseInt(id), session.id_user, old_status, new_status, action_history, description_history);
@@ -95,9 +112,12 @@ export const DELETE = async (request: Request, { params }: { params: Promise<{ i
       return NextResponse.json({ message: 'ID de tarea es necesario' }, { status: 400 });
     }
 
-    const body = await request.json();
-    const { titleTask, priorityTask, statusTask } = body;
+    const task = await TaskService.getTaskById(parseInt(id));
 
+    if (!task) {
+      return NextResponse.json({ message: `Tarea con ID:${id} no fue encontrada` }, { status: 404 });
+    }
+   
     let prioridad = '';
     let estado = '';
     let action_history = '';
@@ -105,30 +125,30 @@ export const DELETE = async (request: Request, { params }: { params: Promise<{ i
     let old_status = '';
     let new_status = '';
     
-    if (priorityTask === 'low') {
+    if (task.priority_task === 'low') {
       prioridad = 'Baja';
     }
-    if (priorityTask === 'medium') {
+    if (task.priority_task === 'medium') {
       prioridad = 'Media';
     }
-    if (priorityTask === 'high') {
+    if (task.priority_task === 'high') {
       prioridad = 'Alta';
     }
     
-    if (statusTask === 'todo') {
+    if (task.status_task === 'todo') {
       estado = 'To-do';
     }
-    if (statusTask === 'in_progress') {
+    if (task.status_task === 'in_progress') {
       estado = 'En progreso';
     }
-    if (statusTask === 'done') {
+    if (task.status_task === 'done') {
       estado = 'Completado';
     }
 
     action_history = 'Tarea eliminada';
-    description_history = `${titleTask} con prioridad: ${prioridad}, estado: ${estado} y ID: ${id}`;
+    description_history = `${task.title_task} con prioridad: ${prioridad}, estado: ${estado} y ID Tarea: ${task.id_task}`;
    
-    const deletedRows = await TaskService.deleteTask(parseInt(id));
+    const deletedRows = await TaskService.deleteTask(parseInt(task.id_task));
 
     if (deletedRows === 0) {
       return NextResponse.json({ message: 'Tarea no encontrada' }, { status: 404 });

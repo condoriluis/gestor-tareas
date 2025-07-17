@@ -91,7 +91,7 @@ export const historyPaths = {
         delete: {
             tags: ['Historial'],
             summary: 'Eliminar historial de tareas',
-            description: 'Elimina un historial específico o todo el historial del usuario autenticado',
+            description: 'Elimina un historial específico o todo el historial del usuario por ID de usuario',
             operationId: 'deleteHistory',
             security: [{ bearerAuth: [] }],
             parameters: [
@@ -106,7 +106,7 @@ export const historyPaths = {
                 in: 'query',
                 name: 'id_history',
                 schema: { type: 'integer' },
-                description: 'ID del registro específico a eliminar (opcional)'
+                description: 'ID del historial a eliminar'
             }
             ],
             responses: {

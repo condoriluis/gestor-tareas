@@ -12,10 +12,9 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json();
-  const { title_task, description_task, priority_task, status_task, date_start_task, date_completed_task } = body;
+  const { title_task, description_task, priority_task } = body;
 
   let prioridad = "";
-  let estado = "";
   if (priority_task.trim() === "low") {
     prioridad = "Baja";
   }
@@ -26,31 +25,19 @@ export async function POST(request: Request) {
     prioridad = "Alta";
   }
 
-  if (status_task.trim() === "todo") {
-    estado = "To-do";
-  }
-  if (status_task.trim() === "in_progress") {
-    estado = "En progreso";
-  }
-  if (status_task.trim() === "done") {
-    estado = "Completado";
-  }
-
   const old_status = '';
   const new_status = '';
   const action_history = 'Tarea creada';
-  const description_history = `${title_task} con prioridad: ${prioridad} y estado: ${estado}`;
+  const description_history = `${title_task} con prioridad: ${prioridad} y estado: To-do`;
 
   try {
     
-    const newTaskId = await TaskService.createTask(session.id_user, title_task, description_task, priority_task, status_task, date_start_task, date_completed_task);
+    const newTaskId = await TaskService.createTask(session.id_user, title_task, description_task, priority_task, 'todo', null, null);
     const newTask = await TaskService.getTaskById(newTaskId);
     
     await TaskHistoryService.createTaskHistory(newTaskId, session.id_user, old_status, new_status, action_history, description_history);
     
-    return NextResponse.json(
-      newTask, { status: 201 }
-    );
+    return NextResponse.json(newTask, { status: 201 });
 
   } catch (error) {
     return NextResponse.json(

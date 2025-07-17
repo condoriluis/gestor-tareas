@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useDrop } from 'react-dnd';
 import { showToast } from "@/utils/toastMessages";
-import { nowBolivia, toBoliviaDateTime } from '@/utils/dateService';
 import { Task } from '@/utils/types'
 import TaskCard from './TaskCard';
 import AddTask from './AddTask';
@@ -39,7 +38,6 @@ const TaskList: React.FC<TaskListProps> = () => {
     title: string;
     priority: string;
     status_old: string;
-    date_start_old: string;
   } | null>(null);
 
   const [showStatusModal, setShowStatusModal] = useState(false);
@@ -77,7 +75,7 @@ const TaskList: React.FC<TaskListProps> = () => {
     setTasks(prevTasks => prevTasks.filter(task => task.id_task !== id)); 
   };
 
-  const handleStatusChange = async (taskId: number, newStatus: string, title: string, priority: string, status_old: string, date_start_old: string) => {
+  const handleStatusChange = async (taskId: number, newStatus: string, title: string, priority: string, status_old: string) => {
     if (status_old === 'todo' && newStatus === 'done') {
       showToast('No puedes marcar como completada una tarea que no ha comenzado', 'error');
       return;
@@ -86,7 +84,7 @@ const TaskList: React.FC<TaskListProps> = () => {
     if (newStatus === 'in_progress') {
       setConfirmTitle('Confirmar inicio de tarea');
       setConfirmMessage(`¿Estás seguro de iniciar la tarea "${title}"?`);
-      setPendingStatusChange({ taskId, newStatus, title, priority, status_old, date_start_old });
+      setPendingStatusChange({ taskId, newStatus, title, priority, status_old });
       setShowConfirmModal(true);
       return;
     }
@@ -94,12 +92,12 @@ const TaskList: React.FC<TaskListProps> = () => {
     if (newStatus === 'done') {
       setConfirmTitle('Confirmar completado');
       setConfirmMessage(`¿Estás seguro de marcar como completada la tarea "${title}"?`);
-      setPendingStatusChange({ taskId, newStatus, title, priority, status_old, date_start_old });
+      setPendingStatusChange({ taskId, newStatus, title, priority, status_old });
       setShowConfirmModal(true);
       return;
     }
 
-    await processStatusChange(taskId, newStatus, title, priority, status_old, date_start_old);
+    await processStatusChange(taskId, newStatus, title, priority, status_old);
   };
 
   const handleMobileStatusChange = (task: Task) => {
@@ -126,8 +124,7 @@ const TaskList: React.FC<TaskListProps> = () => {
         newStatus,
         title: currentTask.title_task,
         priority: currentTask.priority_task,
-        status_old: currentTask.status_task,
-        date_start_old: currentTask.date_start_task || ''
+        status_old: currentTask.status_task
       });
       setShowConfirmModal(true);
       setShowStatusModal(false);
@@ -139,57 +136,25 @@ const TaskList: React.FC<TaskListProps> = () => {
       newStatus,
       currentTask.title_task,
       currentTask.priority_task,
-      currentTask.status_task,
-      currentTask.date_start_task || ''
+      currentTask.status_task || ''
     );
     setShowStatusModal(false);
   };
 
-  const processStatusChange = async (taskId: number, newStatus: string, title: string, priority: string, status_old: string, date_start_old: string) => {
+  const processStatusChange = async (taskId: number, newStatus: string, title: string, priority: string, status_old: string) => {
     setTasks((prevTasks) =>
       prevTasks.map((task) =>
-        task.id_task === taskId ? { ...task, status_task: newStatus, title_task: title, priority_task: priority } : task
+        task.id_task === taskId ? { ...task, status_task: newStatus, title_task: title, priority_task: priority, status_old } : task
       )
     );
   
-    let dateStart = null;
-    let dateCompleted = null;
-
-    if (newStatus === 'todo') {
-      dateStart = null;
-      dateCompleted = null;
-    }
-
-    if (newStatus === 'in_progress') {
-      dateStart = nowBolivia();
-      dateCompleted = null;
-    }
-
-    if (newStatus === 'done') {
-      dateStart = date_start_old 
-        ? (typeof date_start_old === 'string' && date_start_old.includes('T') 
-            ? toBoliviaDateTime(date_start_old)
-            : date_start_old)
-        : nowBolivia();
-      
-      dateCompleted = nowBolivia();
-    }
-
-    const taskData = {
-      idTask: taskId,
-      status: newStatus,
-      title,
-      priority,
-      date_start: dateStart,
-      date_completed: dateCompleted,
-      old_status: status_old
-    };
+    
 
     try {
       const response = await fetch(`/api/tasks`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...taskData }),
+        body: JSON.stringify({ taskId, newStatus }),
       });
 
       if (!response.ok) throw new Error('Error al actualizar tarea');
@@ -293,7 +258,7 @@ const TaskList: React.FC<TaskListProps> = () => {
             {statuses.map(({ key, label, color }) => {
               const [, drop] = useDrop(() => ({
                 accept: "TASK",
-                drop: (item: Task) => handleStatusChange(item.id_task, key, item.title_task, item.priority_task, item.status_task, item.date_start_task || ''),
+                drop: (item: Task) => handleStatusChange(item.id_task, key, item.title_task, item.priority_task, item.status_task || ''),
               }));
 
               const ref = useRef<HTMLDivElement | null>(null);
@@ -362,7 +327,7 @@ const TaskList: React.FC<TaskListProps> = () => {
                 { label: 'Mover a EN PROGRESO', value: 'in_progress', disabled: currentTask.status_task === 'in_progress' },
                 { label: 'Mover a COMPLETADO', value: 'done', disabled: currentTask.status_task === 'done' }
               ]}
-              currentStatus={currentTask.status_task}
+              currentStatus={currentTask.status_task || ''}
               onClose={() => setShowStatusModal(false)}
               onStatusChange={handleStatusChangeMobile}
             />
@@ -382,8 +347,7 @@ const TaskList: React.FC<TaskListProps> = () => {
               pendingStatusChange.newStatus,
               pendingStatusChange.title,
               pendingStatusChange.priority,
-              pendingStatusChange.status_old,
-              pendingStatusChange.date_start_old
+              pendingStatusChange.status_old
             );
           }
           setShowConfirmModal(false);

@@ -2,7 +2,7 @@ import { NextResponse, NextRequest } from 'next/server';
 import { validateToken } from '@/utils/validateToken';
 import { TaskService } from './TaskService';
 import { UserService } from '../auth/UserService';
-import { toBoliviaDateTime } from '@/utils/dateService';
+import { nowBolivia, toBoliviaDateTime } from '@/utils/dateService';
 import { TaskHistoryService } from './TaskHistoryService';
 
 export async function GET(request: Request) {
@@ -38,45 +38,62 @@ export async function PATCH(request: NextRequest) {
     const user = await UserService.getUserById(session.id_user);
 
     const body = await request.json();
-    const { idTask, status, title, priority, date_start, date_completed, old_status } = body;
+    const { taskId, newStatus } = body;
+
+    const task = await TaskService.getTaskById(parseInt(taskId));
+
+    if (!task) {
+      return NextResponse.json({ message: `Tarea con ID:${taskId} no fue encontrada` }, { status: 404 });
+    }
 
     let prioridad = '';
     let action_history = '';
     let description_history = '';
     
-    if (priority === 'low') {
+    if (task.priority_task === 'low') {
       prioridad = 'Baja';
     }
-    if (priority === 'medium') {
+    if (task.priority_task === 'medium') {
       prioridad = 'Media';
     }
-    if (priority === 'high') {
+    if (task.priority_task === 'high') {
       prioridad = 'Alta';
     }
 
     action_history = 'Estado cambiado';
-    description_history = `Tarea: ${title} con prioridad: ${prioridad}`;
+    description_history = `Tarea: ${task.title_task} con prioridad: ${prioridad}`;
 
-    const validatedDateStart = date_start 
-      ? (typeof date_start === 'string' && date_start.includes('T')
-          ? toBoliviaDateTime(date_start)
-          : date_start)
-      : null;
+    let dateStart = null;
+    let dateCompleted = null;
+
+    if (newStatus === 'todo') {
+      dateStart = null;
+      dateCompleted = null;
+    }
+
+    if (newStatus === 'in_progress') {
+      dateStart = nowBolivia();
+      dateCompleted = null;
+    }
+
+    if (newStatus === 'done') {
+      dateStart = task.date_start_task 
+        ? (typeof task.date_start_task === 'string' && task.date_start_task.includes('T') 
+            ? toBoliviaDateTime(task.date_start_task)
+            : task.date_start_task)
+        : nowBolivia();
       
-    const validatedDateCompleted = date_completed
-      ? (typeof date_completed === 'string' && date_completed.includes('T')
-          ? toBoliviaDateTime(date_completed)
-          : date_completed)
-      : null;
+      dateCompleted = nowBolivia();
+    }
 
-    const updateStatus = await TaskService.updateTaskStatus(session.id_user, user.rol_user, idTask, status, validatedDateStart, validatedDateCompleted);
+    const updateStatusTask = await TaskService.updateTaskStatus(session.id_user, user.rol_user, taskId, newStatus, dateStart, dateCompleted);
     
-    if (updateStatus) {
-      await TaskHistoryService.createTaskHistory(idTask, session.id_user, old_status, status, action_history, description_history);
+    if (updateStatusTask) {
+      await TaskHistoryService.createTaskHistory(taskId, session.id_user, task.status_task, newStatus, action_history, description_history);
     }
         
-    const updatedTask = await TaskService.getTaskById(idTask);
-    return NextResponse.json(updatedTask, { status: 200 });
+    const getUpdatedStatusTask = await TaskService.getTaskById(taskId);
+    return NextResponse.json(getUpdatedStatusTask, { status: 200 });
 
   } catch (error) {
     return NextResponse.json(

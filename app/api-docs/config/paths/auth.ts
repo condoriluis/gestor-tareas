@@ -146,8 +146,8 @@ export const authPaths = {
     '/api/auth/forgot': {
         post: {
         tags: ['Autenticación'],
-        summary: 'Recuperar contraseña',
-        description: 'Envía una contraseña temporal al correo del usuario.',
+        summary: 'Recuperar contraseña por correo',
+        description: 'Envía una contraseña temporal al correo electrónico del usuario.',
         operationId: 'forgotPassword',
         requestBody: {
             required: true,

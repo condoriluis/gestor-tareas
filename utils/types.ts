@@ -5,10 +5,10 @@ export interface Task {
   title_task: string;
   description_task: string;
   priority_task: string;
-  status_task: string;
-  date_start_task: string | null;
-  date_completed_task: string | null;
-  date_created_task: string;
+  status_task?: string;
+  date_start_task?: string | null;
+  date_completed_task?: string | null;
+  date_created_task?: string;
 }
 
 export interface TaskHistory {

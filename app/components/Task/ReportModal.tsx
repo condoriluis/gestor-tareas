@@ -1,4 +1,4 @@
-import { MdClose, MdOutlineDownload, MdPhotoCamera } from "react-icons/md";
+import { MdClose, MdPhotoCamera } from "react-icons/md";
 import { 
   MdCheckCircle, 
   MdAccessTime, 

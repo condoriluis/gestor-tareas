@@ -36,7 +36,7 @@ export class TaskService {
         }
     }
 
-    static async createTask(id_user_task: number, title_task: string, description_task: string, priority_task: string, status_task: string, date_start_task: string, date_completed_task: string) {
+    static async createTask(id_user_task: number, title_task: string, description_task: string, priority_task: string, status_task: string, date_start_task: string | null, date_completed_task: string | null) {
         const connection = await connectDB();
         try {
             const [rows]: any = await connection.query(

@@ -70,46 +70,23 @@ export const taskPaths = {
             requestBody: {
                 required: true,
                 content: {
-                'application/json': {
-                    schema: {
-                    type: 'object',
-                    required: ['idTask'],
-                    properties: {
-                        idTask: {
-                        type: 'integer',
-                        example: 0
-                        },
-                        title: {
-                        type: 'string',
-                        example: 'Tarea 1'
-                        },
-                        priority: {
-                        type: 'string',
-                        enum: ['low', 'medium', 'high'],
-                        example: 'medium'
-                        },
-                        old_status: {
-                        type: 'string',
-                        example: 'todo'
-                        },
-                        status: {
-                        type: 'string',
-                        enum: ['todo', 'in_progress', 'done'],
-                        example: 'in_progress'
-                        },
-                        date_start: {
-                        type: 'string',
-                        format: 'date-time',
-                        example: '2025-01-01T10:00:00.000Z'
-                        },
-                        date_completed: {
-                        type: 'string',
-                        format: 'date-time',
-                        example: null
+                    'application/json': {
+                        schema: {
+                            type: 'object',
+                            required: ['taskId', 'newStatus'],
+                            properties: {
+                                taskId: {
+                                type: 'integer',
+                                example: 0
+                                },
+                                newStatus: {
+                                type: 'string',
+                                enum: ['todo', 'in_progress', 'done'],
+                                example: 'in_progress'
+                                }
+                            }
                         }
                     }
-                    }
-                }
                 }
             },
             responses: {
@@ -138,38 +115,23 @@ export const taskPaths = {
                 content: {
                 'application/json': {
                     schema: {
-                    type: 'object',
-                    required: ['title_task', 'description_task', 'priority_task', 'status_task'],
-                    properties: {
-                        title_task: {
-                        type: 'string',
-                        example: 'Reunión de equipo'
-                        },
-                        description_task: {
-                        type: 'string',
-                        example: 'Discutir los objetivos del sprint'
-                        },
-                        priority_task: {
-                        type: 'string',
-                        enum: ['low', 'medium', 'high'],
-                        example: 'medium'
-                        },
-                        status_task: {
-                        type: 'string',
-                        enum: ['todo', 'in_progress', 'done'],
-                        example: 'todo'
-                        },
-                        date_start_task: {
-                        type: 'string',
-                        format: 'date-time',
-                        example: null
-                        },
-                        date_completed_task: {
-                        type: 'string',
-                        format: 'date-time',
-                        example: null
+                        type: 'object',
+                        required: ['title_task', 'description_task', 'priority_task'],
+                        properties: {
+                            title_task: {
+                            type: 'string',
+                            example: 'Reunión de equipo'
+                            },
+                            description_task: {
+                            type: 'string',
+                            example: 'Discutir los objetivos del sprint'
+                            },
+                            priority_task: {
+                            type: 'string',
+                            enum: ['low', 'medium', 'high'],
+                            example: 'medium'
+                            }
                         }
-                    }
                     }
                 }
                 }
@@ -335,21 +297,6 @@ export const taskPaths = {
                 description: 'ID de la tarea a eliminar'
             }
             ],
-            requestBody: {
-            required: true,
-            content: {
-                'application/json': {
-                schema: {
-                    type: 'object',
-                    properties: {
-                    titleTask: { type: 'string' },
-                    priorityTask: { type: 'string' },
-                    statusTask: { type: 'string' }
-                    }
-                }
-                }
-            }
-            },
             responses: {
             204: {
                 description: 'Tarea eliminada exitosamente'
@@ -359,6 +306,9 @@ export const taskPaths = {
             },
             401: {
                 description: 'No autorizado'
+            },
+            404: {
+                description: 'Tarea no encontrada'
             },
             500: {
                 description: 'Error al eliminar la tarea'
