@@ -42,6 +42,10 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ message: `Tarea con ID:${taskId} no fue encontrada` }, { status: 404 });
     }
 
+    if (task.status === newStatus) {
+      return NextResponse.json(task, { status: 200 });
+    }
+
     let prioridad = '';
     if (task.priority === 'low') prioridad = 'Baja';
     if (task.priority === 'medium') prioridad = 'Media';

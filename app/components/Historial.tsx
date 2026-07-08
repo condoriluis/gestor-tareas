@@ -26,6 +26,7 @@ export default function Historial({ user }: HistorialProps) {
 
   const [isOpen, setIsOpen] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
+  const [isHistoryLoading, setIsHistoryLoading] = useState(false);
 
   useEffect(() => {
     const isDesktop = window.innerWidth >= 768;
@@ -49,6 +50,7 @@ export default function Historial({ user }: HistorialProps) {
   useEffect(() => {
     const fetchHistory = async () => {
       try {
+        setIsHistoryLoading(true);
         const targetUserId = userId || user?.id;
         if (!targetUserId) return;
 
@@ -59,6 +61,8 @@ export default function Historial({ user }: HistorialProps) {
         setHistory(data);
       } catch {
         console.error('Error fetching history:');
+      } finally {
+        setIsHistoryLoading(false);
       }
     };
 
@@ -287,7 +291,22 @@ export default function Historial({ user }: HistorialProps) {
               </div>
 
               <div className="space-y-3">
-                {filteredHistory.length > 0 ? (
+                {isHistoryLoading ? (
+                  <div className="space-y-3">
+                    {[1, 2, 3, 4, 5].map((i) => (
+                      <div key={i} className="bg-[#2A2A2A] p-4 rounded-lg border-l-4 border-gray-700">
+                        <div className="flex items-start gap-3">
+                          <div className="w-5 h-5 bg-gray-700 rounded-full animate-pulse mt-0.5" />
+                          <div className="flex-1 space-y-2">
+                            <div className="h-3 w-32 bg-gray-700 rounded animate-pulse" />
+                            <div className="h-4 w-3/4 bg-gray-700 rounded animate-pulse" />
+                            <div className="h-3 w-1/2 bg-gray-700 rounded animate-pulse" />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : filteredHistory.length > 0 ? (
                   filteredHistory.map((item) => (
                     <div
                       key={item.id}

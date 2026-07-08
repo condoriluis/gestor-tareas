@@ -32,9 +32,9 @@ export default function LogoutButton() {
     <>
       <button
         onClick={() => setShowConfirm(true)}
-        className="text-gray-300 hover:text-white text-sm sm:text-base transition cursor-pointer flex items-center gap-1"
+        className="text-gray-400 hover:text-white transition cursor-pointer p-1.5 rounded-md hover:bg-[#2A2A2A]"
       >
-        <span><MdLogout size={20} /></span>
+        <MdLogout size={16} />
       </button>
 
       {showConfirm && (

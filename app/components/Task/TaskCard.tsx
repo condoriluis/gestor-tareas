@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { useDrag } from 'react-dnd';
 import EditTask from "./EditTask"
 import { Task } from '@/utils/types'
@@ -19,10 +19,16 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onUpdate, onDeleteSuccess, on
   const [editMode, setEditMode] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-
-  const isMobile = window.innerWidth <= 768;
+  const [isMobile, setIsMobile] = useState(false);
 
   const [pressTimer, setPressTimer] = useState<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth <= 768);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
 
   const handleTouchStart = () => {
     if (isMobile) {

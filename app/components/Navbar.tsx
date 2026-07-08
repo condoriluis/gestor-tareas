@@ -84,15 +84,12 @@ export default function Navbar({
 
   if (isLoading) {
     return (
-      <nav className="bg-[#1E1E1E] border-b border-gray-700 px-4 sm:px-8 py-3 sm:py-4">
+      <nav className="bg-[#1E1E1E] border-b border-gray-700 px-4 sm:px-6 py-1.5 sm:py-2">
         <div className="flex justify-between items-center max-w-7xl mx-auto">
-          <div className="h-7 w-36 bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 rounded-md animate-pulse"></div>
-          <div className="flex items-center gap-4">
-            <div className="h-9 w-56 bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 rounded-lg animate-pulse"></div>
-            <div className="h-9 w-56 bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 rounded-lg animate-pulse"></div>
-            <div className="flex items-center gap-2">
-              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-gray-700 to-gray-600 animate-pulse"></div>
-            </div>
+          <div className="h-5 w-28 bg-gray-700 rounded animate-pulse" />
+          <div className="flex items-center gap-3">
+            <div className="h-7 w-40 bg-gray-700 rounded animate-pulse" />
+            <div className="h-7 w-7 rounded-full bg-gray-700 animate-pulse" />
           </div>
         </div>
       </nav>
@@ -102,22 +99,20 @@ export default function Navbar({
   return (
     <>
       <AboutModal isOpen={isAboutModalOpen} onClose={() => setIsAboutModalOpen(false)} />
-      <nav className="bg-[#1E1E1E] border-b border-gray-700 px-4 sm:px-8 py-3 sm:py-4">
-        <div className="flex flex-col sm:flex-row justify-between items-center max-w-7xl mx-auto gap-3 sm:gap-0">
-          <div className="flex items-center">
-            <a href="/task" className="flex items-center gap-2">
-              <h1 className="text-white text-lg sm:text-xl font-bold">Gestor de tareas</h1>
-            </a>
-          </div>
+      <nav className="bg-[#1E1E1E] border-b border-gray-700 px-4 sm:px-6 py-1.5 sm:py-2">
+        <div className="flex items-center justify-between max-w-7xl mx-auto gap-2">
+          <a href="/task" className="flex items-center gap-2 shrink-0">
+            <h1 className="text-white text-sm sm:text-base font-bold tracking-tight">Gestor de tareas</h1>
+          </a>
 
-          <div className="flex items-center gap-1 sm:gap-3 flex-wrap justify-between">
-            <div className="relative w-full sm:flex-1 sm:max-w-md mx-2 sm:mx-4">
-              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                <MdSearch className="text-gray-400" size={20} />
+          <div className="flex items-center gap-1 sm:gap-2 flex-1 justify-end">
+            <div className="relative w-full max-w-[200px] sm:max-w-xs">
+              <div className="absolute inset-y-0 left-0 flex items-center pl-2 pointer-events-none">
+                <MdSearch className="text-gray-500" size={14} />
               </div>
               <input
                 type="text"
-                className="w-full bg-[#2A2A2A] border border-gray-700 rounded-xl pl-10 pr-8 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-[#00E57B] focus:border-transparent transition-all text-sm sm:text-base"
+                className="w-full bg-[#2A2A2A] border border-gray-700 rounded-lg pl-7 pr-6 py-1.5 text-white focus:outline-none focus:ring-1 focus:ring-[#00E57B] focus:border-transparent transition-all text-xs sm:text-sm"
                 placeholder="Buscar tareas..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -128,9 +123,9 @@ export default function Navbar({
                     setSearchTerm('');
                     setSuggestions([]);
                   }}
-                  className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-white transition-colors"
+                  className="absolute inset-y-0 right-0 flex items-center pr-1.5 text-gray-500 hover:text-white transition-colors"
                 >
-                  <MdClose size={18} />
+                  <MdClose size={14} />
                 </button>
               )}
               {mounted && suggestions.length > 0 && (
@@ -138,7 +133,7 @@ export default function Navbar({
                   {suggestions.map((suggestion, i) => (
                     <div
                       key={i}
-                      className="px-4 py-2 hover:bg-[#343434] cursor-pointer text-white text-sm"
+                      className="px-3 py-1.5 hover:bg-[#343434] cursor-pointer text-white text-xs"
                       onClick={() => {
                         setSearchTerm(suggestion);
                         setSuggestions([]);
@@ -151,63 +146,59 @@ export default function Navbar({
               )}
             </div>
 
-            <div className="flex items-center gap-2 sm:gap-4">
+            <div className="flex items-center gap-0.5 sm:gap-1.5">
               <button
                 onClick={onOpenFilterModal}
-                className="text-gray-300 hover:text-white text-sm sm:text-base transition cursor-pointer flex items-center gap-1"
+                className="text-gray-400 hover:text-white transition cursor-pointer p-1.5 rounded-md hover:bg-[#2A2A2A]"
+                title="Filtros"
               >
-                <MdFilterList size={20} />
-                <span className="hidden sm:inline">Filtros</span>
+                <MdFilterList size={16} />
               </button>
 
               <button
                 onClick={onOpenReportModal}
-                className="text-gray-300 hover:text-white text-sm sm:text-base transition cursor-pointer flex items-center gap-1"
+                className="text-gray-400 hover:text-white transition cursor-pointer p-1.5 rounded-md hover:bg-[#2A2A2A]"
+                title="Reportes"
               >
-                <MdOutlineShowChart size={20} />
-                <span className="hidden sm:inline">Reportes</span>
+                <MdOutlineShowChart size={16} />
               </button>
 
               {user?.rol === 'admin' && <UserListModal />}
 
               <button
                 onClick={() => setIsAboutModalOpen(true)}
-                className="text-gray-300 hover:text-white text-sm sm:text-base transition cursor-pointer flex items-center gap-1"
+                className="text-gray-400 hover:text-white transition cursor-pointer p-1.5 rounded-md hover:bg-[#2A2A2A]"
+                title="Acerca de"
               >
-                <MdInfoOutline size={20} />
-                <span className="hidden sm:inline">Acerca de</span>
+                <MdInfoOutline size={16} />
               </button>
 
               <div className="relative group">
                 <button
                   onClick={onOpenAddTaskModal}
-                  className="bg-[#00E57B] hover:bg-teal-600 text-white transition text-xs sm:text-sm px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-md transition-all cursor-pointer flex items-center gap-1 shadow-sm hover:shadow-md active:scale-95"
+                  className="bg-[#00E57B] hover:bg-teal-600 text-white text-xs px-2 py-1 rounded-md transition-all cursor-pointer flex items-center gap-0.5 shadow-sm hover:shadow-md active:scale-95"
                 >
-                  <span>+</span>
+                  <span className="text-sm leading-none">+</span>
                   <span className="hidden sm:inline">Nueva tarea</span>
                 </button>
-                <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-800 transition text-white text-xs px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none sm:hidden">
+                <div className="absolute -top-7 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-[10px] px-1.5 py-0.5 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none sm:hidden">
                   Nueva tarea
                 </div>
               </div>
 
               <div className="flex items-center gap-1">
-                <div className="flex items-center gap-1">
-                  <div className="relative group">
-                    <span className="text-white text-sm font-medium">{user?.name}</span>
-                  </div>
-                  <div
-                    className="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center overflow-hidden border-2 border-[#00E57B] cursor-pointer"
-                    onClick={() => setIsProfileModalOpen(true)}
-                  >
-                    {user?.name ? (
-                      <span className="text-white text-sm font-medium">
-                        {user.name.charAt(0).toUpperCase()}
-                      </span>
-                    ) : (
-                      <span className="text-white text-sm font-medium">U</span>
-                    )}
-                  </div>
+                <div
+                  className="w-7 h-7 rounded-full bg-gray-600 flex items-center justify-center overflow-hidden border border-[#00E57B] cursor-pointer hover:opacity-80 transition-opacity"
+                  onClick={() => setIsProfileModalOpen(true)}
+                  title={user?.name}
+                >
+                  {user?.name ? (
+                    <span className="text-white text-xs font-medium">
+                      {user.name.charAt(0).toUpperCase()}
+                    </span>
+                  ) : (
+                    <span className="text-white text-xs font-medium">U</span>
+                  )}
                 </div>
                 <LogoutButton />
               </div>

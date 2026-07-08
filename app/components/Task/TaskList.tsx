@@ -203,7 +203,7 @@ const TaskList: React.FC<TaskListProps> = () => {
       />
 
       <div className="flex flex-1 overflow-hidden">
-        <main className="flex-1 p-4 h-[calc(100vh-64px)] md:p-6 overflow-y-auto scrollbar-custom">
+        <main className="flex-1 p-4 h-[calc(100vh-48px)] md:p-6 overflow-y-auto scrollbar-custom">
           <div className="md:hidden flex items-center justify-center text-sm text-gray-400">
             <MdInfoOutline className="mr-1" />
             <span>Pulsa una tarea para cambiar su estado</span>
@@ -251,11 +251,36 @@ const TaskList: React.FC<TaskListProps> = () => {
             )}
           </div>
 
+          {isLoading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {['todo', 'in_progress', 'done'].map((key) => (
+                <div key={key} className="bg-[#2A2A2A] p-4 rounded-lg border-2 border-gray-700 shadow-lg">
+                  <div className="h-6 w-24 bg-gray-700 rounded animate-pulse mb-4 mx-auto" />
+                  <div className="space-y-3">
+                    {[1, 2, 3].map((i) => (
+                      <div key={i} className="bg-[#343434] rounded-lg p-4 space-y-2">
+                        <div className="h-4 w-3/4 bg-gray-700 rounded animate-pulse" />
+                        <div className="h-3 w-full bg-gray-700 rounded animate-pulse" />
+                        <div className="h-3 w-1/2 bg-gray-700 rounded animate-pulse" />
+                        <div className="flex justify-between pt-2">
+                          <div className="h-6 w-16 bg-gray-700 rounded-full animate-pulse" />
+                          <div className="h-6 w-6 bg-gray-700 rounded animate-pulse" />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {statuses.map(({ key, label, color }) => {
               const [, drop] = useDrop(() => ({
                 accept: "TASK",
-                drop: (item: { id: number; title: string; priority: string; status?: string }) => handleStatusChange(item.id, key, item.title, item.priority, item.status || ''),
+                drop: (item: { id: number; title: string; priority: string; status?: string }) => {
+                  if (item.status === key) return;
+                  handleStatusChange(item.id, key, item.title, item.priority, item.status || '');
+                },
               }));
 
               const ref = useRef<HTMLDivElement | null>(null);
@@ -292,6 +317,7 @@ const TaskList: React.FC<TaskListProps> = () => {
             })}
 
           </div>
+          )}
 
           {isModalOpen && (
             <AddTask

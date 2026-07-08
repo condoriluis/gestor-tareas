@@ -165,7 +165,7 @@ export const ReportModal = ({ isOpen, onClose, tasks }: ReportModalProps) => {
         </div>
 
         <div className="flex-1 p-4 sm:p-6 overflow-auto">
-          <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
             {[
               { 
                 label: "Tareas completadas", 

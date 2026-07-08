@@ -199,10 +199,10 @@ export default function UserListModal() {
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="text-gray-300 hover:text-white text-sm sm:text-base transition cursor-pointer flex items-center gap-1"
+        className="text-gray-400 hover:text-white transition cursor-pointer p-1.5 rounded-md hover:bg-[#2A2A2A]"
+        title="Usuarios"
       >
-        <MdOutlinePeople size={20} />
-        <span className="hidden sm:inline">Usuarios</span>
+        <MdOutlinePeople size={16} />
       </button>
 
       {isOpen && (
