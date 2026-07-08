@@ -4,6 +4,7 @@ import { showToast } from '@/utils/toastMessages';
 import { useState, useEffect } from 'react';
 import { FiClock, FiX, FiUser, FiChevronRight, FiChevronLeft, FiPlusCircle, FiEdit2, FiRefreshCw, FiActivity, FiDelete, FiSearch, FiTrash2 } from 'react-icons/fi';
 import { MdClose } from 'react-icons/md';
+import { DateTime } from 'luxon';
 import { TaskHistory } from '@/utils/types';
 import { useTaskUser } from '@/app/context/TaskUserContext';
 
@@ -79,32 +80,19 @@ export default function Historial({ user }: HistorialProps) {
   }, [user?.id, userId, isOpen, isInitialized]);
 
   const formatHistoryDate = (dateString: string) => {
-    const now = new Date();
-    const date = new Date(dateString);
+    const dt = DateTime.fromISO(dateString, { zone: 'utc' }).setZone('America/La_Paz');
+    const now = DateTime.now().setZone('America/La_Paz');
 
-    const today = new Date(now);
-    today.setHours(0, 0, 0, 0);
+    const today = now.startOf('day');
+    const yesterday = today.minus({ days: 1 });
+    const inputDate = dt.startOf('day');
 
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
+    const formattedTime = dt.toFormat('hh:mm a');
 
-    const inputDate = new Date(date);
-    inputDate.setHours(0, 0, 0, 0);
+    if (inputDate.equals(today)) return `Hoy, ${formattedTime}`;
+    if (inputDate.equals(yesterday)) return `Ayer, ${formattedTime}`;
 
-    const timeFormat = new Intl.DateTimeFormat('es', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true
-    });
-
-    const formattedTime = timeFormat.format(date)
-      .replace('a. m.', 'AM')
-      .replace('p. m.', 'PM');
-
-    if (inputDate.getTime() === today.getTime()) return `Hoy, ${formattedTime}`;
-    if (inputDate.getTime() === yesterday.getTime()) return `Ayer, ${formattedTime}`;
-
-    const diffDays = Math.floor((today.getTime() - inputDate.getTime()) / (1000 * 60 * 60 * 24));
+    const diffDays = Math.floor(today.diff(inputDate, 'days').days);
     return `Hace ${diffDays} días, ${formattedTime}`;
   };
 

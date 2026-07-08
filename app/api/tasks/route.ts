@@ -2,7 +2,6 @@ import { NextResponse, NextRequest } from 'next/server';
 import { validateToken } from '@/utils/validateToken';
 import { TaskService } from './TaskService';
 import { UserService } from '../auth/UserService';
-import { nowBolivia, toBoliviaDateTime } from '@/utils/dateService';
 import { TaskHistoryService } from './TaskHistoryService';
 
 export async function GET() {
@@ -54,25 +53,16 @@ export async function PATCH(request: NextRequest) {
     const action_history = 'Estado cambiado';
     const description_history = `Tarea: ${task.title} con prioridad: ${prioridad}`;
 
-    let dateStart = null;
-    let dateCompleted = null;
-
-    if (newStatus === 'todo') {
-      dateStart = null;
-      dateCompleted = null;
-    }
+    let dateStart: Date | null = null;
+    let dateCompleted: Date | null = null;
 
     if (newStatus === 'in_progress') {
-      dateStart = nowBolivia();
-      dateCompleted = null;
+      dateStart = new Date();
     }
 
     if (newStatus === 'done') {
-      dateStart = task.startDate
-        ? toBoliviaDateTime(task.startDate.toISOString())
-        : nowBolivia();
-
-      dateCompleted = nowBolivia();
+      dateStart = task.startDate ?? new Date();
+      dateCompleted = new Date();
     }
 
     const updateStatusTask = await TaskService.updateTaskStatus(session.id, user?.rol ?? 'user', taskId, newStatus, dateStart, dateCompleted);

@@ -20,7 +20,7 @@ export class TaskService {
     return { ...task, user_name: task.user.name };
   }
 
-  static async createTask(userId: number, title: string, description: string, priority: string, status: string, startDate: string | null, completedDate: string | null) {
+  static async createTask(userId: number, title: string, description: string, priority: string, status: string, startDate: Date | null, completedDate: Date | null) {
     const task = await db.task.create({
       data: {
         userId,
@@ -28,8 +28,8 @@ export class TaskService {
         description,
         priority,
         status,
-        startDate: startDate ? new Date(startDate) : null,
-        completedDate: completedDate ? new Date(completedDate) : null,
+        startDate,
+        completedDate,
       },
     });
     return task.id;
@@ -47,18 +47,14 @@ export class TaskService {
     return result.count;
   }
 
-  static async updateTaskStatus(idUser: number, rolUser: string, idTask: number, status: string, startDate: string | null, completedDate: string | null) {
+  static async updateTaskStatus(idUser: number, rolUser: string, idTask: number, status: string, startDate: Date | null, completedDate: Date | null) {
     const where = rolUser === 'admin'
       ? { id: idTask }
       : { id: idTask, userId: idUser };
 
     const result = await db.task.updateMany({
       where,
-      data: {
-        status,
-        startDate: startDate ? new Date(startDate) : null,
-        completedDate: completedDate ? new Date(completedDate) : null,
-      },
+      data: { status, startDate, completedDate },
     });
     return result.count;
   }
