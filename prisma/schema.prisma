@@ -9,14 +9,16 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement()) @map("id_user")
-  email     String   @unique @map("email_user")
-  password  String   @map("password_user")
-  name      String?  @map("name_user")
-  status    Int?     @default(1) @map("status_user")
-  rol       String?  @default("user") @map("rol_user")
-  createdAt DateTime @default(now()) @map("date_created_user")
-  updatedAt DateTime @updatedAt @map("date_updated_user")
+  id               Int       @id @default(autoincrement()) @map("id_user")
+  email            String    @unique @map("email_user")
+  password         String    @map("password_user")
+  name             String?   @map("name_user")
+  status           Int?      @default(1) @map("status_user")
+  rol              String?   @default("user") @map("rol_user")
+  resetToken       String?   @unique @map("reset_token_user")
+  resetTokenExpiry DateTime? @map("reset_token_expiry_user")
+  createdAt        DateTime  @default(now()) @map("date_created_user")
+  updatedAt        DateTime  @updatedAt @map("date_updated_user")
 
   tasks         Task[]
   taskHistories TaskHistory[]

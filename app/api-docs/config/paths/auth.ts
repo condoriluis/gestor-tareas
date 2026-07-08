@@ -147,7 +147,7 @@ export const authPaths = {
         post: {
         tags: ['Autenticación'],
         summary: 'Recuperar contraseña por correo',
-        description: 'Envía una contraseña temporal al correo electrónico del usuario.',
+        description: 'Envía un enlace de restablecimiento de contraseña al correo electrónico del usuario.',
         operationId: 'forgotPassword',
         requestBody: {
             required: true,
@@ -175,7 +175,7 @@ export const authPaths = {
                     properties: {
                     message: {
                         type: 'string',
-                        example: 'Se ha enviado una nueva contraseña a tu correo electrónico.'
+                        example: 'Instrucciones enviadas con éxito al correo: usuario@ejemplo.com'
                     }
                     }
                 }

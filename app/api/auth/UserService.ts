@@ -1,5 +1,6 @@
 import { db } from '@/lib/db';
 import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
 
 export class UserService {
 
@@ -40,12 +41,44 @@ export class UserService {
     return bcrypt.compare(password, hashedPassword);
   }
 
-  static async forgotPassword(email: string, newPassword: string) {
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
-    return db.user.update({
+  static async storeResetToken(email: string) {
+    const rawToken = crypto.randomBytes(32).toString('hex');
+    const hashedToken = await bcrypt.hash(rawToken, 10);
+    const expiry = new Date(Date.now() + 60 * 60 * 1000); // 1 hora
+
+    await db.user.update({
       where: { email },
-      data: { password: hashedPassword },
+      data: { resetToken: hashedToken, resetTokenExpiry: expiry },
     });
+
+    return rawToken;
+  }
+
+  static async resetPassword(token: string, newPassword: string) {
+    const users = await db.user.findMany({
+      where: {
+        resetToken: { not: null },
+        resetTokenExpiry: { gt: new Date() },
+      },
+    });
+
+    let matchedUser = null;
+    for (const user of users) {
+      if (user.resetToken && await bcrypt.compare(token, user.resetToken)) {
+        matchedUser = user;
+        break;
+      }
+    }
+
+    if (!matchedUser) return null;
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await db.user.update({
+      where: { id: matchedUser.id },
+      data: { password: hashedPassword, resetToken: null, resetTokenExpiry: null },
+    });
+
+    return matchedUser;
   }
 
   static async updatePassword(id: number, newPassword: string) {
