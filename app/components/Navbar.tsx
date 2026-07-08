@@ -99,21 +99,21 @@ export default function Navbar({
   return (
     <>
       <AboutModal isOpen={isAboutModalOpen} onClose={() => setIsAboutModalOpen(false)} />
-      <nav className="bg-[#1E1E1E] border-b border-gray-700 px-4 sm:px-6 py-1.5 sm:py-2">
-        <div className="flex items-center justify-between max-w-7xl mx-auto gap-2">
-          <a href="/task" className="flex items-center gap-2 shrink-0">
-            <h1 className="text-white text-sm sm:text-base font-bold tracking-tight">Gestor de tareas</h1>
+      <nav className="bg-[#1E1E1E] border-b border-gray-700 px-2 sm:px-6 py-1.5 sm:py-2">
+        <div className="flex items-center justify-between max-w-7xl mx-auto gap-1 sm:gap-2">
+          <a href="/task" className="flex items-center gap-1 shrink-0">
+            <h1 className="text-white text-xs sm:text-base font-bold tracking-tight truncate max-w-[90px] sm:max-w-none">Gestor de tareas</h1>
           </a>
 
-          <div className="flex items-center gap-1 sm:gap-2 flex-1 justify-end">
-            <div className="relative w-full max-w-[200px] sm:max-w-xs">
-              <div className="absolute inset-y-0 left-0 flex items-center pl-2 pointer-events-none">
-                <MdSearch className="text-gray-500" size={14} />
+          <div className="flex items-center gap-0.5 sm:gap-2 flex-1 justify-end min-w-0">
+            <div className="relative flex-1 max-w-[90px] sm:max-w-[200px] lg:max-w-xs">
+              <div className="absolute inset-y-0 left-0 flex items-center pl-1.5 sm:pl-2 pointer-events-none">
+                <MdSearch className="text-gray-500" size={12} />
               </div>
               <input
                 type="text"
-                className="w-full bg-[#2A2A2A] border border-gray-700 rounded-lg pl-7 pr-6 py-1.5 text-white focus:outline-none focus:ring-1 focus:ring-[#00E57B] focus:border-transparent transition-all text-xs sm:text-sm"
-                placeholder="Buscar tareas..."
+                className="w-full bg-[#2A2A2A] border border-gray-700 rounded-lg pl-6 sm:pl-7 pr-5 sm:pr-6 py-1 sm:py-1.5 text-white focus:outline-none focus:ring-1 focus:ring-[#00E57B] focus:border-transparent transition-all text-xs"
+                placeholder="Buscar"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -123,9 +123,9 @@ export default function Navbar({
                     setSearchTerm('');
                     setSuggestions([]);
                   }}
-                  className="absolute inset-y-0 right-0 flex items-center pr-1.5 text-gray-500 hover:text-white transition-colors"
+                  className="absolute inset-y-0 right-0 flex items-center pr-1 text-gray-500 hover:text-white transition-colors"
                 >
-                  <MdClose size={14} />
+                  <MdClose size={12} />
                 </button>
               )}
               {mounted && suggestions.length > 0 && (
@@ -149,7 +149,7 @@ export default function Navbar({
             <div className="flex items-center gap-0.5 sm:gap-1.5">
               <button
                 onClick={onOpenFilterModal}
-                className="text-gray-400 hover:text-white transition cursor-pointer p-1.5 rounded-md hover:bg-[#2A2A2A]"
+                className="text-gray-400 hover:text-white transition cursor-pointer p-1 rounded-md hover:bg-[#2A2A2A]"
                 title="Filtros"
               >
                 <MdFilterList size={16} />
@@ -157,7 +157,7 @@ export default function Navbar({
 
               <button
                 onClick={onOpenReportModal}
-                className="text-gray-400 hover:text-white transition cursor-pointer p-1.5 rounded-md hover:bg-[#2A2A2A]"
+                className="text-gray-400 hover:text-white transition cursor-pointer p-1 rounded-md hover:bg-[#2A2A2A] hidden sm:inline-flex"
                 title="Reportes"
               >
                 <MdOutlineShowChart size={16} />
@@ -167,7 +167,7 @@ export default function Navbar({
 
               <button
                 onClick={() => setIsAboutModalOpen(true)}
-                className="text-gray-400 hover:text-white transition cursor-pointer p-1.5 rounded-md hover:bg-[#2A2A2A]"
+                className="text-gray-400 hover:text-white transition cursor-pointer p-1 rounded-md hover:bg-[#2A2A2A] hidden sm:inline-flex"
                 title="Acerca de"
               >
                 <MdInfoOutline size={16} />
@@ -176,7 +176,7 @@ export default function Navbar({
               <div className="relative group">
                 <button
                   onClick={onOpenAddTaskModal}
-                  className="bg-[#00E57B] hover:bg-teal-600 text-white text-xs px-2 py-1 rounded-md transition-all cursor-pointer flex items-center gap-0.5 shadow-sm hover:shadow-md active:scale-95"
+                  className="bg-[#00E57B] hover:bg-teal-600 text-white text-xs px-1.5 sm:px-2 py-1 rounded-md transition-all cursor-pointer flex items-center gap-0.5 shadow-sm hover:shadow-md active:scale-95"
                 >
                   <span className="text-sm leading-none">+</span>
                   <span className="hidden sm:inline">Nueva tarea</span>
@@ -186,18 +186,18 @@ export default function Navbar({
                 </div>
               </div>
 
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-0.5">
                 <div
-                  className="w-7 h-7 rounded-full bg-gray-600 flex items-center justify-center overflow-hidden border border-[#00E57B] cursor-pointer hover:opacity-80 transition-opacity"
+                  className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-gray-600 flex items-center justify-center overflow-hidden border border-[#00E57B] cursor-pointer hover:opacity-80 transition-opacity"
                   onClick={() => setIsProfileModalOpen(true)}
                   title={user?.name}
                 >
                   {user?.name ? (
-                    <span className="text-white text-xs font-medium">
+                    <span className="text-white text-[10px] sm:text-xs font-medium">
                       {user.name.charAt(0).toUpperCase()}
                     </span>
                   ) : (
-                    <span className="text-white text-xs font-medium">U</span>
+                    <span className="text-white text-[10px] sm:text-xs font-medium">U</span>
                   )}
                 </div>
                 <LogoutButton />
