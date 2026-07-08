@@ -1,113 +1,75 @@
-import { connectDB } from '@/utils/db';
+import { db } from '@/lib/db';
 
 export class TaskService {
 
-    static async getAllTasks(id_user_task: number) {
-        const connection = await connectDB();
-        try {
-            const [rows]: any = await connection.query(`
-                SELECT t.*, u.name_user as user_name 
-                FROM tasks t
-                JOIN users u ON t.id_user_task = u.id_user
-                WHERE t.id_user_task = ?
-                ORDER BY t.date_created_task DESC
-                `,
-                [id_user_task]
-            );
-        return rows;
-        } finally {
-            connection.release();
-        }
-    }
+  static async getAllTasks(userId: number) {
+    const tasks = await db.task.findMany({
+      where: { userId },
+      include: { user: { select: { name: true } } },
+      orderBy: { createdAt: 'desc' },
+    });
+    return tasks.map(t => ({ ...t, user_name: t.user.name }));
+  }
 
-    static async getTaskById(id_task: number) {
-        const connection = await connectDB();
-        try {
-            const [rows]: any = await connection.query(`
-                SELECT t.*, u.name_user as user_name
-                FROM tasks t
-                JOIN users u ON t.id_user_task = u.id_user
-                WHERE t.id_task = ?`,
-                [id_task]
-            );
-            return rows[0];
-        } finally {
-            connection.release();
-        }
-    }
+  static async getTaskById(id: number) {
+    const task = await db.task.findUnique({
+      where: { id },
+      include: { user: { select: { name: true } } },
+    });
+    if (!task) return null;
+    return { ...task, user_name: task.user.name };
+  }
 
-    static async createTask(id_user_task: number, title_task: string, description_task: string, priority_task: string, status_task: string, date_start_task: string | null, date_completed_task: string | null) {
-        const connection = await connectDB();
-        try {
-            const [rows]: any = await connection.query(
-                'INSERT INTO tasks (id_user_task, title_task, description_task, priority_task, status_task, date_start_task, date_completed_task) VALUES (?, ?, ?, ?, ?, ?, ?)',
-                [id_user_task, title_task, description_task, priority_task, status_task, date_start_task, date_completed_task]
-            );
-            return rows.insertId;
-        } finally {
-            connection.release();
-        }
-    }
+  static async createTask(userId: number, title: string, description: string, priority: string, status: string, startDate: string | null, completedDate: string | null) {
+    const task = await db.task.create({
+      data: {
+        userId,
+        title,
+        description,
+        priority,
+        status,
+        startDate: startDate ? new Date(startDate) : null,
+        completedDate: completedDate ? new Date(completedDate) : null,
+      },
+    });
+    return task.id;
+  }
 
-    static async updateTask(id_user: number, rol_user: string, id_task: number, title_task: string, description_task: string, priority_task: string) {
-        const connection = await connectDB();
-        try {
-            if (rol_user === 'admin') {
-                const [rows]: any = await connection.query(
-                    'UPDATE tasks SET title_task = ?, description_task = ?, priority_task = ? WHERE id_task = ?',
-                    [title_task, description_task, priority_task, id_task]
-                );
-                return rows.affectedRows;
-            } else {
-                const [rows]: any = await connection.query(
-                    'UPDATE tasks SET title_task = ?, description_task = ?, priority_task = ? WHERE id_task = ? AND id_user_task = ?',
-                    [title_task, description_task, priority_task, id_task, id_user]
-                );
-                return rows.affectedRows;
-            }
-            
-        } finally {
-            connection.release();
-        }
-    }
+  static async updateTask(idUser: number, rolUser: string, idTask: number, title: string, description: string, priority: string) {
+    const where = rolUser === 'admin'
+      ? { id: idTask }
+      : { id: idTask, userId: idUser };
 
-    static async updateTaskStatus(id_user: number, rol_user: string, id_task: number, status_task: string, date_start_task: string | null, date_completed_task: string | null) {
-        const connection = await connectDB(); 
-        try {
+    const result = await db.task.updateMany({
+      where,
+      data: { title, description, priority },
+    });
+    return result.count;
+  }
 
-            const startDate = date_start_task || null;
-            const completedDate = date_completed_task || null;
+  static async updateTaskStatus(idUser: number, rolUser: string, idTask: number, status: string, startDate: string | null, completedDate: string | null) {
+    const where = rolUser === 'admin'
+      ? { id: idTask }
+      : { id: idTask, userId: idUser };
 
-            if (rol_user === 'admin') {
-                const [rows]: any = await connection.query(
-                    'UPDATE tasks SET status_task = ?, date_start_task = ?, date_completed_task = ? WHERE id_task = ?',
-                    [status_task, startDate, completedDate, id_task]
-                );
-                return rows.affectedRows;
-            } else {
-                const [rows]: any = await connection.query(
-                    'UPDATE tasks SET status_task = ?, date_start_task = ?, date_completed_task = ? WHERE id_task = ? AND id_user_task = ?',
-                    [status_task, startDate, completedDate, id_task, id_user]
-                );
-                return rows.affectedRows;
-            }
-            
-        } finally {
-            connection.release();
-        }
-    }
+    const result = await db.task.updateMany({
+      where,
+      data: {
+        status,
+        startDate: startDate ? new Date(startDate) : null,
+        completedDate: completedDate ? new Date(completedDate) : null,
+      },
+    });
+    return result.count;
+  }
 
-    static async deleteTask(id_task: number) {
-        const connection = await connectDB();
-        try {
-            const [rows]: any = await connection.query(
-                'DELETE FROM tasks WHERE id_task = ?',
-                [id_task]
-            );
-            return rows.affectedRows;
-        } finally {
-            connection.release();
-        }
-    }
+  static async deleteTask(id: number, userId: number, rol: string) {
+    const where = rol === 'admin'
+      ? { id }
+      : { id, userId };
 
+    await db.taskHistory.deleteMany({ where: { taskId: id } });
+    const result = await db.task.deleteMany({ where });
+    return result.count;
+  }
 }

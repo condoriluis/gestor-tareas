@@ -28,7 +28,7 @@ const TaskList: React.FC<TaskListProps> = () => {
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  
+
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [confirmMessage, setConfirmMessage] = useState('');
   const [confirmTitle, setConfirmTitle] = useState('');
@@ -51,7 +51,7 @@ const TaskList: React.FC<TaskListProps> = () => {
         if (!response.ok) throw new Error('Error al obtener tareas.');
         const data = await response.json();
         setTasks(data);
-      } catch (error) {
+      } catch {
         showToast('Error al cargar la tarea.', 'error');
       } finally {
         setIsLoading(false);
@@ -67,12 +67,12 @@ const TaskList: React.FC<TaskListProps> = () => {
 
   const handleUpdateTask = async (updatedTask: Task) => {
     setTasks(prevTasks =>
-      prevTasks.map(task => (task.id_task === updatedTask.id_task ? updatedTask : task))
+      prevTasks.map(task => (task.id === updatedTask.id ? updatedTask : task))
     );
   };
 
   const handleDeleteTask = (id: number) => {
-    setTasks(prevTasks => prevTasks.filter(task => task.id_task !== id)); 
+    setTasks(prevTasks => prevTasks.filter(task => task.id !== id));
   };
 
   const handleStatusChange = async (taskId: number, newStatus: string, title: string, priority: string, status_old: string) => {
@@ -80,7 +80,7 @@ const TaskList: React.FC<TaskListProps> = () => {
       showToast('No puedes marcar como completada una tarea que no ha comenzado', 'error');
       return;
     }
-    
+
     if (newStatus === 'in_progress') {
       setConfirmTitle('Confirmar inicio de tarea');
       setConfirmMessage(`¿Estás seguro de iniciar la tarea "${title}"?`);
@@ -88,7 +88,7 @@ const TaskList: React.FC<TaskListProps> = () => {
       setShowConfirmModal(true);
       return;
     }
-    
+
     if (newStatus === 'done') {
       setConfirmTitle('Confirmar completado');
       setConfirmMessage(`¿Estás seguro de marcar como completada la tarea "${title}"?`);
@@ -107,36 +107,36 @@ const TaskList: React.FC<TaskListProps> = () => {
 
   const handleStatusChangeMobile = async (newStatus: string) => {
     if (!currentTask) return;
-    
-    if (currentTask.status_task === 'todo' && newStatus === 'done') {
+
+    if (currentTask.status === 'todo' && newStatus === 'done') {
       showToast('No puedes marcar como completada una tarea que no ha comenzado', 'error');
       setShowStatusModal(false);
       return;
     }
-    
-    if ((currentTask.status_task === 'todo' && newStatus === 'in_progress') || 
-        (currentTask.status_task === 'in_progress' && newStatus === 'done')) {
+
+    if ((currentTask.status === 'todo' && newStatus === 'in_progress') ||
+        (currentTask.status === 'in_progress' && newStatus === 'done')) {
       const action = newStatus === 'in_progress' ? 'comenzar' : 'completar';
       setConfirmTitle(`Confirmar ${action} tarea`);
-      setConfirmMessage(`¿Estás seguro que deseas ${action} la tarea "${currentTask.title_task}"?`);
+      setConfirmMessage(`¿Estás seguro que deseas ${action} la tarea "${currentTask.title}"?`);
       setPendingStatusChange({
-        taskId: currentTask.id_task,
+        taskId: currentTask.id,
         newStatus,
-        title: currentTask.title_task,
-        priority: currentTask.priority_task,
-        status_old: currentTask.status_task
+        title: currentTask.title,
+        priority: currentTask.priority,
+        status_old: currentTask.status ?? ''
       });
       setShowConfirmModal(true);
       setShowStatusModal(false);
       return;
     }
-    
+
     await processStatusChange(
-      currentTask.id_task,
+      currentTask.id,
       newStatus,
-      currentTask.title_task,
-      currentTask.priority_task,
-      currentTask.status_task || ''
+      currentTask.title,
+      currentTask.priority,
+      currentTask.status ?? ''
     );
     setShowStatusModal(false);
   };
@@ -144,11 +144,9 @@ const TaskList: React.FC<TaskListProps> = () => {
   const processStatusChange = async (taskId: number, newStatus: string, title: string, priority: string, status_old: string) => {
     setTasks((prevTasks) =>
       prevTasks.map((task) =>
-        task.id_task === taskId ? { ...task, status_task: newStatus, title_task: title, priority_task: priority, status_old } : task
+        task.id === taskId ? { ...task, status: newStatus, title, priority, status_old } : task
       )
     );
-  
-    
 
     try {
       const response = await fetch(`/api/tasks`, {
@@ -158,17 +156,17 @@ const TaskList: React.FC<TaskListProps> = () => {
       });
 
       if (!response.ok) throw new Error('Error al actualizar tarea');
-      
+
       window.dispatchEvent(new Event('history-refresh'));
       showToast('Estado actualizado correctamente.', 'success');
 
       const updatedTask = await response.json();
-      setTasks(prevTasks => 
-        prevTasks.map(task => 
-          task.id_task === taskId ? { ...task, ...updatedTask } : task
+      setTasks(prevTasks =>
+        prevTasks.map(task =>
+          task.id === taskId ? { ...task, ...updatedTask } : task
         )
       );
-    } catch (error) {
+    } catch {
       showToast('No se pudo actualizar el estado.', 'error');
     }
   };
@@ -180,23 +178,22 @@ const TaskList: React.FC<TaskListProps> = () => {
   ];
 
   const filteredTasks = tasks.filter(task => {
-    
-    if (activeFilter && task.priority_task !== activeFilter) {
+    if (activeFilter && task.priority !== activeFilter) {
       return false;
     }
-    
-    if (searchTerm && 
-      !task.title_task.toLowerCase().includes(searchTerm.toLowerCase()) && 
-      !task.description_task.toLowerCase().includes(searchTerm.toLowerCase())) {
+
+    if (searchTerm &&
+      !task.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      !task.description.toLowerCase().includes(searchTerm.toLowerCase())) {
       return false;
     }
-    
+
     return true;
   });
 
   return (
     <div className="min-h-screen bg-[#1E1E1E] text-white">
-      <Navbar 
+      <Navbar
         user={user}
         tasks={tasks}
         onSearch={(term) => setSearchTerm(term)}
@@ -204,7 +201,7 @@ const TaskList: React.FC<TaskListProps> = () => {
         onOpenReportModal={() => setIsReportModalOpen(true)}
         onOpenAddTaskModal={() => setIsModalOpen(true)}
       />
-      
+
       <div className="flex flex-1 overflow-hidden">
         <main className="flex-1 p-4 h-[calc(100vh-64px)] md:p-6 overflow-y-auto scrollbar-custom">
           <div className="md:hidden flex items-center justify-center text-sm text-gray-400">
@@ -216,7 +213,7 @@ const TaskList: React.FC<TaskListProps> = () => {
             <div className="flex flex-col gap-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <button 
+                  <button
                     onClick={() => setUserId(null)}
                     className="flex items-center gap-1 p-2 rounded-lg border border-gray-700 bg-[#00E57B] hover:bg-green-500 transition-colors"
                     aria-label="Volver a mis tareas"
@@ -244,7 +241,7 @@ const TaskList: React.FC<TaskListProps> = () => {
                 <span className="text-sm text-white">
                   Filtro por prioridad: {activeFilter === 'low' ? 'Baja' : activeFilter === 'medium' ? 'Media' : 'Alta'}
                 </span>
-                <button 
+                <button
                   onClick={() => setActiveFilter(null)}
                   className="text-gray-300 hover:text-white"
                 >
@@ -258,7 +255,7 @@ const TaskList: React.FC<TaskListProps> = () => {
             {statuses.map(({ key, label, color }) => {
               const [, drop] = useDrop(() => ({
                 accept: "TASK",
-                drop: (item: Task) => handleStatusChange(item.id_task, key, item.title_task, item.priority_task, item.status_task || ''),
+                drop: (item: { id: number; title: string; priority: string; status?: string }) => handleStatusChange(item.id, key, item.title, item.priority, item.status || ''),
               }));
 
               const ref = useRef<HTMLDivElement | null>(null);
@@ -273,19 +270,19 @@ const TaskList: React.FC<TaskListProps> = () => {
                   <h2 className="text-lg font-semibold text-white text-center mb-4">{label}</h2>
                   <div className="space-y-3">
                     {filteredTasks
-                      .filter(task => task.status_task === key)
+                      .filter(task => task.status === key)
                       .map(task => (
-                        <TaskCard 
-                          key={task.id_task} 
-                          task={task} 
-                          onUpdate={handleUpdateTask} 
-                          onDeleteSuccess={handleDeleteTask} 
+                        <TaskCard
+                          key={task.id}
+                          task={task}
+                          onUpdate={handleUpdateTask}
+                          onDeleteSuccess={handleDeleteTask}
                           onMobileStatusChange={handleMobileStatusChange}
                         />
                       ))}
 
                     {filteredTasks
-                      .filter(task => task.status_task === key)
+                      .filter(task => task.status === key)
                       .length === 0 && (
                         <p className="text-center text-gray-400">Sin tareas</p>
                       )}
@@ -293,18 +290,18 @@ const TaskList: React.FC<TaskListProps> = () => {
                 </div>
               );
             })}
-            
+
           </div>
 
           {isModalOpen && (
-            <AddTask 
+            <AddTask
               onCreate={handleCreateTask}
-              onCancel={() => setIsModalOpen(false)} 
+              onCancel={() => setIsModalOpen(false)}
             />
           )}
 
-          <FilterModal 
-            isOpen={isFilterModalOpen} 
+          <FilterModal
+            isOpen={isFilterModalOpen}
             onClose={() => setIsFilterModalOpen(false)}
             activeFilter={activeFilter}
             setActiveFilter={setActiveFilter}
@@ -313,30 +310,30 @@ const TaskList: React.FC<TaskListProps> = () => {
             tasks={tasks}
           />
 
-          <ReportModal 
-            isOpen={isReportModalOpen} 
+          <ReportModal
+            isOpen={isReportModalOpen}
             onClose={() => setIsReportModalOpen(false)}
             tasks={tasks}
           />
 
           {showStatusModal && currentTask && (
             <StatusChangeModal
-              taskTitle={currentTask.title_task}
+              taskTitle={currentTask.title}
               options={[
-                { label: 'Mover a TODO', value: 'todo', disabled: currentTask.status_task === 'todo' },
-                { label: 'Mover a EN PROGRESO', value: 'in_progress', disabled: currentTask.status_task === 'in_progress' },
-                { label: 'Mover a COMPLETADO', value: 'done', disabled: currentTask.status_task === 'done' }
+                { label: 'Mover a TODO', value: 'todo', disabled: currentTask.status === 'todo' },
+                { label: 'Mover a EN PROGRESO', value: 'in_progress', disabled: currentTask.status === 'in_progress' },
+                { label: 'Mover a COMPLETADO', value: 'done', disabled: currentTask.status === 'done' }
               ]}
-              currentStatus={currentTask.status_task || ''}
+              currentStatus={currentTask.status || ''}
               onClose={() => setShowStatusModal(false)}
               onStatusChange={handleStatusChangeMobile}
             />
           )}
         </main>
-        
+
         <Historial user={user} />
       </div>
-      
+
       <ConfirmModal
         isOpen={showConfirmModal}
         onClose={() => setShowConfirmModal(false)}

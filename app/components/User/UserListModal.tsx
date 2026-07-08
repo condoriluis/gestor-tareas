@@ -25,13 +25,13 @@ export default function UserListModal() {
   const [loading, setLoading] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
-  
+
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
-  const [sortConfig, setSortConfig] = useState<SortConfig>({ 
-    key: 'date_created_user', 
-    direction: 'descending' 
+  const [sortConfig, setSortConfig] = useState<SortConfig>({
+    key: 'createdAt',
+    direction: 'descending'
   });
   const [statusFilter, setStatusFilter] = useState<number | null>(null);
   const [roleFilter, setRoleFilter] = useState<string | null>(null);
@@ -69,13 +69,12 @@ export default function UserListModal() {
       if (!response.ok) throw new Error('Error al obtener usuarios.');
       const data = await response.json();
       setUsers(data);
-    } catch (error) {
+    } catch {
       showToast('Error al cargar usuarios.', 'error');
     } finally {
       setLoading(false);
     }
   };
-
 
   useEffect(() => {
     if (isOpen) {
@@ -85,23 +84,23 @@ export default function UserListModal() {
 
   const filteredUsers = useMemo(() => {
     let filtered = [...users];
-    
+
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
-      filtered = filtered.filter(user => 
-        user.name_user.toLowerCase().includes(term) || 
-        user.email_user.toLowerCase().includes(term)
+      filtered = filtered.filter(user =>
+        user.name.toLowerCase().includes(term) ||
+        user.email.toLowerCase().includes(term)
       );
     }
-    
+
     if (statusFilter !== null) {
-      filtered = filtered.filter(user => user.status_user === statusFilter);
+      filtered = filtered.filter(user => user.status === statusFilter);
     }
-    
+
     if (roleFilter) {
-      filtered = filtered.filter(user => user.rol_user === roleFilter);
+      filtered = filtered.filter(user => user.rol === roleFilter);
     }
-    
+
     if (sortConfig.key) {
       filtered.sort((a, b) => {
         if (a[sortConfig.key] < b[sortConfig.key]) {
@@ -113,7 +112,7 @@ export default function UserListModal() {
         return 0;
       });
     }
-    
+
     return filtered;
   }, [users, searchTerm, statusFilter, roleFilter, sortConfig]);
 
@@ -137,33 +136,33 @@ export default function UserListModal() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ idUser, status: newStatus })
       });
-      
+
       if (!response.ok) throw new Error();
-      
+
       showToast(
-        `Usuario ${newStatus === 1 ? 'activado' : 'desactivado'} correctamente`, 
+        `Usuario ${newStatus === 1 ? 'activado' : 'desactivado'} correctamente`,
         'success'
       );
       refreshUsers();
-    } catch (error) {
+    } catch {
       showToast('Error al cambiar estado', 'error');
     }
   };
 
-  const handleEditSubmit = async (userData: {idUser: number; name: string; email: string; rol: string}) => {
+  const handleEditSubmit = async (userData: { idUser: number; name: string; email: string; rol: string }) => {
     try {
       const response = await fetch('/api/users', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(userData)
       });
-      
+
       if (!response.ok) throw new Error();
-      
+
       showToast('Usuario actualizado correctamente', 'success');
       refreshUsers();
       return true;
-    } catch (error) {
+    } catch {
       showToast('Error al actualizar usuario', 'error');
       return false;
     }
@@ -171,20 +170,20 @@ export default function UserListModal() {
 
   const handleDelete = async () => {
     if (!userToDelete) return;
-    
+
     try {
       const response = await fetch('/api/users', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ idUser: userToDelete.id_user })
+        body: JSON.stringify({ idUser: userToDelete.id })
       });
-      
+
       if (!response.ok) throw new Error();
-      
+
       showToast('Usuario eliminado correctamente', 'success');
       setDeleteModalOpen(false);
       refreshUsers();
-    } catch (error) {
+    } catch {
       showToast('Error al eliminar usuario', 'error');
     }
   };
@@ -198,7 +197,7 @@ export default function UserListModal() {
 
   return (
     <>
-      <button 
+      <button
         onClick={() => setIsOpen(true)}
         className="text-gray-300 hover:text-white text-sm sm:text-base transition cursor-pointer flex items-center gap-1"
       >
@@ -212,7 +211,7 @@ export default function UserListModal() {
             <div className="flex justify-between items-center p-4 border-b border-gray-700">
               <div className="flex items-center gap-2">
                 <h3 className="text-xl font-semibold text-white">Gestión de Usuarios</h3>
-                
+
                 <button
                   onClick={() => setAddUserModalOpen(true)}
                   className="hidden md:flex items-center gap-2 px-1 py-1 bg-[#00E57B] hover:bg-[#00C56A] text-white rounded-lg transition-colors cursor-pointer"
@@ -230,7 +229,7 @@ export default function UserListModal() {
                 <MdAdd size={24} />
               </button>
 
-              <button 
+              <button
                 onClick={() => setIsOpen(false)}
                 className="text-gray-400 hover:text-white p-1 rounded-full hover:bg-gray-700 transition"
               >
@@ -269,50 +268,50 @@ export default function UserListModal() {
                   <div className="block md:hidden space-y-4 p-4">
                     {currentItems.length > 0 ? (
                       currentItems.map(user => (
-                        <div key={user.id_user} className="bg-[#252525] p-4 rounded-lg border border-gray-700">
+                        <div key={user.id} className="bg-[#252525] p-4 rounded-lg border border-gray-700">
                           <div className="flex items-center gap-3 mb-3">
                             <div className="w-10 h-10 rounded-full bg-[#00E57B] flex items-center justify-center text-white font-bold">
-                              {user.name_user.charAt(0).toUpperCase()}
+                              {user.name.charAt(0).toUpperCase()}
                             </div>
                             <div>
-                              <h4 className="text-white font-medium">{user.name_user}</h4>
+                              <h4 className="text-white font-medium">{user.name}</h4>
                               <div className="flex items-center gap-2 text-sm text-gray-400">
                                 <MdEmail size={14} />
-                                <span>{user.email_user}</span>
+                                <span>{user.email}</span>
                               </div>
                             </div>
                           </div>
-                          
+
                           <div className="grid grid-cols-2 gap-2 text-sm">
                             <div className="flex items-center gap-2">
-                              <span className="capitalize">{user.rol_user}</span>
+                              <span className="capitalize">{user.rol}</span>
                             </div>
-                            
+
                             <div className="flex items-center gap-2">
                               <label className="relative inline-flex items-center cursor-pointer">
-                                <input 
-                                  type="checkbox" 
-                                  checked={user.status_user === 1}
-                                  onChange={() => handleStatusChange(user.id_user, user.status_user === 1 ? 0 : 1)}
+                                <input
+                                  type="checkbox"
+                                  checked={user.status === 1}
+                                  onChange={() => handleStatusChange(user.id, user.status === 1 ? 0 : 1)}
                                   className="sr-only peer"
                                 />
                                 <div className="w-11 h-6 bg-gray-700 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#00E57B]"></div>
                               </label>
-                              <span className={user.status_user === 1 ? "text-green-500" : "text-red-500"}>
-                                {user.status_user === 1 ? "Activo" : "Inactivo"}
+                              <span className={user.status === 1 ? "text-green-500" : "text-red-500"}>
+                                {user.status === 1 ? "Activo" : "Inactivo"}
                               </span>
                             </div>
-                            
+
                             <div className="col-span-2 text-gray-400 text-sm">
-                              Registro: {formatDate(user.date_created_user)}
+                              Registro: {formatDate(user.createdAt)}
                             </div>
                           </div>
-                          
+
                           <div className="mt-3 flex justify-between">
-                            <button 
+                            <button
                               onClick={() => {
-                                setUserId(user.id_user);
-                                setUserName(user.name_user);
+                                setUserId(user.id);
+                                setUserName(user.name);
                                 setIsOpen(false);
                                 router.push('/task');
                               }}
@@ -322,14 +321,14 @@ export default function UserListModal() {
                               <span>Ver tareas</span>
                             </button>
                             <div className="flex gap-2">
-                              <button 
+                              <button
                                 onClick={() => openEditModal(user)}
                                 className="text-yellow-500 hover:text-yellow-600 text-sm flex items-center gap-1 cursor-pointer hover:text-green-700"
                               >
                                 <MdEdit size={16} />
                                 <span>Editar</span>
                               </button>
-                              <button 
+                              <button
                                 onClick={() => openDeleteModal(user)}
                                 className="text-red-500 hover:text-red-700 text-sm flex items-center gap-1 cursor-pointer"
                               >
@@ -356,7 +355,7 @@ export default function UserListModal() {
                       setUserId(userId);
                       setUserName(userName);
                       setIsOpen(false);
-                      router.push('/task'); 
+                      router.push('/task');
                     }}
                   />
                 </>
@@ -374,7 +373,7 @@ export default function UserListModal() {
                 indexOfLastItem={indexOfLastItem}
               />
             )}
-            
+
             {filteredUsers.length <= itemsPerPage && (
               <div className="p-4 border-t border-gray-700">
                 <span className="text-sm text-gray-400">{filteredUsers.length} usuarios encontrados</span>
@@ -385,7 +384,7 @@ export default function UserListModal() {
       )}
 
       {userToEdit && (
-        <EditUser 
+        <EditUser
           user={userToEdit}
           onClose={closeEditModal}
           onSave={handleEditSubmit}

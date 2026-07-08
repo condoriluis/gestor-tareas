@@ -3,40 +3,40 @@ import { validateToken } from '@/utils/validateToken';
 import { UserService } from '../UserService';
 
 export async function POST(request: Request) {
-  const { currentPassword, newPassword } = await request.json(); 
-  
-  const session = await validateToken()
+  const { currentPassword, newPassword } = await request.json();
+
+  const session = await validateToken();
 
   if (!session) {
     return NextResponse.json({ error: 'No autorizado.' }, { status: 401 })
   }
 
   try {
-    const user = await UserService.getUserById(session.id_user);
-    
+    const user = await UserService.getUserById(session.id);
+
     if (!user) {
       return NextResponse.json(
         { error: 'Usuario no encontrado.' },
         { status: 401 }
       );
     }
-    
-    const passwordMatch = await UserService.verifyPassword(currentPassword, user.password_user);
-    
+
+    const passwordMatch = await UserService.verifyPassword(currentPassword, user.password);
+
     if (!passwordMatch) {
       return NextResponse.json(
         { error: 'Contraseña actual incorrecta.' },
         { status: 401 }
       );
     }
-    
-    await UserService.updatePassword(session.id_user, newPassword);
-    
+
+    await UserService.updatePassword(session.id, newPassword);
+
     return NextResponse.json(
       { message: 'Contraseña actualizada exitosamente.' },
       { status: 200 }
     );
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Error al actualizar la contraseña.' },
       { status: 500 }

@@ -8,9 +8,9 @@ import { TaskHistory } from '@/utils/types';
 import { useTaskUser } from '@/app/context/TaskUserContext';
 
 type UserType = {
-  id_user?: number;
-  name_user?: string;
-  rol_user?: string;
+  id?: number;
+  name?: string;
+  rol?: string;
 };
 
 type HistorialProps = {
@@ -22,23 +22,22 @@ export default function Historial({ user }: HistorialProps) {
   const [history, setHistory] = useState<TaskHistory[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<string>('all');
-  const {userId} = useTaskUser();
-  
+  const { userId } = useTaskUser();
+
   const [isOpen, setIsOpen] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
-    
     const isDesktop = window.innerWidth >= 768;
     setIsOpen(isDesktop);
     setIsInitialized(true);
-    
+
     const handleResize = () => {
       if (window.innerWidth >= 768 && !isOpen) {
         setIsOpen(true);
       }
     };
-    
+
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
@@ -50,16 +49,16 @@ export default function Historial({ user }: HistorialProps) {
   useEffect(() => {
     const fetchHistory = async () => {
       try {
-        const targetUserId = userId || user?.id_user;
+        const targetUserId = userId || user?.id;
         if (!targetUserId) return;
-        
+
         const url = `/api/history/${targetUserId}`;
         const response = await fetch(url);
         if (!response.ok) throw new Error('Error al obtener historial de actividades.');
         const data = await response.json();
         setHistory(data);
-      } catch (error) {
-        console.error('Error fetching history:', error);
+      } catch {
+        console.error('Error fetching history:');
       }
     };
 
@@ -69,38 +68,38 @@ export default function Historial({ user }: HistorialProps) {
     if (isOpen && isInitialized) {
       fetchHistory();
     }
-    
+
     return () => {
       window.removeEventListener('history-refresh', handleRefresh);
     };
-  }, [user?.id_user, userId, isOpen, isInitialized]);
+  }, [user?.id, userId, isOpen, isInitialized]);
 
   const formatHistoryDate = (dateString: string) => {
     const now = new Date();
     const date = new Date(dateString);
-    
+
     const today = new Date(now);
     today.setHours(0, 0, 0, 0);
-    
+
     const yesterday = new Date(today);
     yesterday.setDate(yesterday.getDate() - 1);
-    
+
     const inputDate = new Date(date);
     inputDate.setHours(0, 0, 0, 0);
-    
-    const timeFormat = new Intl.DateTimeFormat('es', { 
-      hour: '2-digit', 
-      minute: '2-digit', 
+
+    const timeFormat = new Intl.DateTimeFormat('es', {
+      hour: '2-digit',
+      minute: '2-digit',
       hour12: true
     });
-    
+
     const formattedTime = timeFormat.format(date)
-      .replace('a. m.', 'AM')
-      .replace('p. m.', 'PM');
-    
+      .replace('a. m.', 'AM')
+      .replace('p. m.', 'PM');
+
     if (inputDate.getTime() === today.getTime()) return `Hoy, ${formattedTime}`;
     if (inputDate.getTime() === yesterday.getTime()) return `Ayer, ${formattedTime}`;
-    
+
     const diffDays = Math.floor((today.getTime() - inputDate.getTime()) / (1000 * 60 * 60 * 24));
     return `Hace ${diffDays} días, ${formattedTime}`;
   };
@@ -115,7 +114,7 @@ export default function Historial({ user }: HistorialProps) {
 
   const getTypeColor = (action: string) => {
     const type = getHistoryType(action);
-    switch(type) {
+    switch (type) {
       case 'creation': return 'border-l-blue-500';
       case 'edition': return 'border-l-orange-500';
       case 'deletion': return 'border-l-red-500';
@@ -125,7 +124,7 @@ export default function Historial({ user }: HistorialProps) {
   };
 
   const translateStatus = (status: string) => {
-    switch(status) {
+    switch (status) {
       case 'todo': return 'To-do';
       case 'in_progress': return 'En progreso';
       case 'done': return 'Completado';
@@ -134,14 +133,14 @@ export default function Historial({ user }: HistorialProps) {
   };
 
   const filteredHistory = history.filter(item => {
-    const matchesSearch = item.description_history.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesType = filterType === 'all' || 
-      (filterType === 'creation' && item.action_history.includes('Tarea creada')) ||
-      (filterType === 'edition' && item.action_history.includes('Tarea editada')) ||
-      (filterType === 'status-change' && item.action_history.includes('Estado cambiado')) ||
-      (filterType === 'deletion' && item.action_history.includes('Tarea eliminada'));
-    
+    const matchesSearch = item.description.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesType = filterType === 'all' ||
+      (filterType === 'creation' && item.action.includes('Tarea creada')) ||
+      (filterType === 'edition' && item.action.includes('Tarea editada')) ||
+      (filterType === 'status-change' && item.action.includes('Estado cambiado')) ||
+      (filterType === 'deletion' && item.action.includes('Tarea eliminada'));
+
     return matchesSearch && matchesType;
   });
 
@@ -157,30 +156,30 @@ export default function Historial({ user }: HistorialProps) {
   const handleDeleteHistory = async () => {
     setIsDeleting(true);
     try {
-      const targetUserId = userId || user?.id_user;
+      const targetUserId = userId || user?.id;
       if (!targetUserId) return;
-      
-      const url = deleteItemId 
+
+      const url = deleteItemId
         ? `/api/history/${targetUserId}?id_history=${deleteItemId}`
         : `/api/history/${targetUserId}`;
-      
+
       const response = await fetch(url, {
         method: 'DELETE',
       });
-      
+
       if (!response.ok) throw new Error();
-      
+
       const data = await response.json();
-      setHistory(prev => deleteItemId 
-        ? prev.filter(item => item.id_history !== deleteItemId)
+      setHistory(prev => deleteItemId
+        ? prev.filter(item => item.id !== deleteItemId)
         : []);
-      
-      showToast(data.message || (deleteItemId 
-        ? 'Elemento del historial eliminado exitosamente' 
+
+      showToast(data.message || (deleteItemId
+        ? 'Elemento del historial eliminado exitosamente'
         : 'Historial completo eliminado exitosamente'), 'success');
-    } catch (error) {
-      showToast(deleteItemId 
-        ? 'Error al eliminar el elemento del historial' 
+    } catch {
+      showToast(deleteItemId
+        ? 'Error al eliminar el elemento del historial'
         : 'Error al eliminar el historial completo', 'error');
     } finally {
       setIsDeleting(false);
@@ -205,8 +204,8 @@ export default function Historial({ user }: HistorialProps) {
         `}
         aria-label={isOpen ? 'Colapsar sidebar' : 'Expandir sidebar'}
       >
-        {isOpen ? 
-          <FiChevronRight className="text-white" size={20} /> : 
+        {isOpen ?
+          <FiChevronRight className="text-white" size={20} /> :
           <FiChevronLeft className="text-white" size={20} />
         }
       </button>
@@ -221,7 +220,7 @@ export default function Historial({ user }: HistorialProps) {
           <h3 className="text-xl font-semibold text-white tracking-tight">
             {isOpen ? 'Historial de actividades' : ''}
           </h3>
-          <button 
+          <button
             onClick={toggleHistorial}
             className="text-gray-400 hover:text-white transition-colors cursor-pointer"
             aria-label={isOpen ? 'Cerrar sidebar' : 'Abrir sidebar'}
@@ -244,7 +243,7 @@ export default function Historial({ user }: HistorialProps) {
                   />
                   <div className="absolute right-3 top-3 flex items-center space-x-2">
                     {searchTerm && (
-                      <button 
+                      <button
                         onClick={() => setSearchTerm('')}
                         className="text-gray-400 hover:text-white"
                       >
@@ -259,20 +258,20 @@ export default function Historial({ user }: HistorialProps) {
                     {['all', 'creation', 'edition', 'status-change', 'deletion'].map((type) => (
                       <button
                         key={type}
-                        className={`px-3 py-1 text-sm rounded-full whitespace-nowrap ${filterType === type 
-                          ? 'bg-blue-600 text-white' 
+                        className={`px-3 py-1 text-sm rounded-full whitespace-nowrap ${filterType === type
+                          ? 'bg-blue-600 text-white'
                           : 'bg-[#2A2A2A] text-gray-300 hover:bg-[#333333]'
-                        }`}
+                          }`}
                         onClick={() => setFilterType(type)}
                       >
-                        {type === 'all' ? 'Todos' : 
-                        type === 'creation' ? 'Creaciones' : 
-                        type === 'edition' ? 'Ediciones' : 
-                        type === 'status-change' ? 'Estados' : 'Eliminaciones'}
+                        {type === 'all' ? 'Todos' :
+                          type === 'creation' ? 'Creaciones' :
+                            type === 'edition' ? 'Ediciones' :
+                              type === 'status-change' ? 'Estados' : 'Eliminaciones'}
                       </button>
                     ))}
                   </div>
-                  {history.length > 0 && user?.rol_user === 'admin' && (
+                  {history.length > 0 && user?.rol === 'admin' && (
                     <div className="flex justify-center">
                       <button
                         onClick={() => handleDeleteConfirmation()}
@@ -286,65 +285,65 @@ export default function Historial({ user }: HistorialProps) {
                   )}
                 </div>
               </div>
-              
+
               <div className="space-y-3">
                 {filteredHistory.length > 0 ? (
                   filteredHistory.map((item) => (
-                    <div 
-                      key={item.id_history}
-                      className={`bg-[#2A2A2A] p-4 rounded-lg border-l-4 ${getTypeColor(item.action_history)}
+                    <div
+                      key={item.id}
+                      className={`bg-[#2A2A2A] p-4 rounded-lg border-l-4 ${getTypeColor(item.action)}
                         hover:bg-[#333333] transition-all duration-200
                         shadow-md hover:shadow-lg`}
                     >
                       <div className="flex items-start gap-3">
                         <div className="mt-0.5">
-                          {getHistoryType(item.action_history) === 'creation' && <FiPlusCircle className="text-blue-400" size={18} />}
-                          {getHistoryType(item.action_history) === 'edition' && <FiEdit2 className="text-orange-400" size={18} />}
-                          {getHistoryType(item.action_history) === 'deletion' && <FiDelete className="text-red-400" size={18} />}
-                          {getHistoryType(item.action_history) === 'status-change' && <FiRefreshCw className="text-purple-400" size={18} />}
-                          {getHistoryType(item.action_history) === 'default' && <FiActivity className="text-gray-400" size={18} />}
+                          {getHistoryType(item.action) === 'creation' && <FiPlusCircle className="text-blue-400" size={18} />}
+                          {getHistoryType(item.action) === 'edition' && <FiEdit2 className="text-orange-400" size={18} />}
+                          {getHistoryType(item.action) === 'deletion' && <FiDelete className="text-red-400" size={18} />}
+                          {getHistoryType(item.action) === 'status-change' && <FiRefreshCw className="text-purple-400" size={18} />}
+                          {getHistoryType(item.action) === 'default' && <FiActivity className="text-gray-400" size={18} />}
                         </div>
                         <div className="flex-1">
                           <div className="flex items-center gap-2 text-gray-400 mb-1 text-xs">
                             <FiClock size={12} className="text-gray-500" />
-                            <span>{formatHistoryDate(item.date_created_history)}</span>
+                            <span>{formatHistoryDate(item.createdAt)}</span>
                           </div>
                           <div className="mb-2">
-                            {item.action_history === 'Estado cambiado' ? (
+                            {item.action === 'Estado cambiado' ? (
                               <>
                                 <p className="text-white font-medium">
-                                  <b className="text-gray-400">{item.action_history}</b> 
+                                  <b className="text-gray-400">{item.action}</b>
                                   <br />
-                                  <b className="text-gray-400">'{translateStatus(item.old_status_history)}'</b> → <b className="text-gray-400">'{translateStatus(item.new_status_history)}'</b>
+                                  <b className="text-gray-400">&apos;{translateStatus(item.oldStatus)}&apos;</b> &rarr; <b className="text-gray-400">&apos;{translateStatus(item.newStatus)}&apos;</b>
                                   <br />
-                                  {item.description_history}
+                                  {item.description}
                                 </p>
                               </>
                             ) : (
                               <>
                                 <p className="text-white font-medium">
-                                  <b className="text-gray-400">{item.action_history}</b> 
+                                  <b className="text-gray-400">{item.action}</b>
                                   <br />
-                                  {item.description_history}</p>
+                                  {item.description}</p>
                               </>
                             )}
                           </div>
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-1 text-xs text-gray-400">
                               <FiUser size={12} />
-                              <span>por {item.user_name}</span>
+                              <span>por {item.user?.name}</span>
                             </div>
-                            {user?.rol_user === 'admin' && (
-                            <button 
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleDeleteConfirmation(item.id_history);
-                              }}
-                              className="text-red-400 hover:text-red-500 text-xs flex items-center gap-1 cursor-pointer"
-                              title="Eliminar el historial"
-                            >
-                              <FiDelete size={12} />
-                            </button>
+                            {user?.rol === 'admin' && (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDeleteConfirmation(item.id);
+                                }}
+                                className="text-red-400 hover:text-red-500 text-xs flex items-center gap-1 cursor-pointer"
+                                title="Eliminar el historial"
+                              >
+                                <FiDelete size={12} />
+                              </button>
                             )}
                           </div>
                         </div>
@@ -370,7 +369,7 @@ export default function Historial({ user }: HistorialProps) {
               <h3 className="text-lg font-medium text-white">
                 {deleteItemId ? 'Confirmar eliminación' : 'Confirmar eliminación completa'}
               </h3>
-              <button 
+              <button
                 onClick={() => setShowDeleteDialog(false)}
                 className="text-gray-400 hover:text-white transition-colors"
                 disabled={isDeleting}
@@ -378,13 +377,13 @@ export default function Historial({ user }: HistorialProps) {
                 <FiX size={20} />
               </button>
             </div>
-            
+
             <p className="text-gray-300 mb-6">
-              {deleteItemId 
+              {deleteItemId
                 ? '¿Está seguro que desea eliminar permanentemente este registro del historial? Esta acción no se puede deshacer.'
                 : '¿Está seguro que desea eliminar permanentemente todo el historial? Todos los registros serán eliminados de forma irreversible.'}
             </p>
-            
+
             <div className="flex justify-end gap-3">
               <button
                 onClick={() => setShowDeleteDialog(false)}
@@ -416,4 +415,4 @@ export default function Historial({ user }: HistorialProps) {
       )}
     </>
   );
-};
+}

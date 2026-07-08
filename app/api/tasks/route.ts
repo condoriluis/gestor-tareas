@@ -5,37 +5,33 @@ import { UserService } from '../auth/UserService';
 import { nowBolivia, toBoliviaDateTime } from '@/utils/dateService';
 import { TaskHistoryService } from './TaskHistoryService';
 
-export async function GET(request: Request) {
-
+export async function GET() {
   const session = await validateToken();
-  
+
   if (!session) {
     return NextResponse.json({ error: 'No autorizado.' }, { status: 401 });
   }
 
   try {
-
-    const tasks = await TaskService.getAllTasks(session.id_user);
+    const tasks = await TaskService.getAllTasks(session.id);
     return NextResponse.json(tasks, { status: 200 });
-    
-  } catch (error) {
+  } catch {
     return NextResponse.json(
-      { message: 'Error al obtener tareas' }, 
+      { message: 'Error al obtener tareas' },
       { status: 500 }
     );
   }
 }
 
 export async function PATCH(request: NextRequest) {
-  const session = await validateToken()
+  const session = await validateToken();
 
   if (!session) {
     return NextResponse.json({ error: 'No autorizado.' }, { status: 401 })
   }
 
   try {
-    
-    const user = await UserService.getUserById(session.id_user);
+    const user = await UserService.getUserById(session.id);
 
     const body = await request.json();
     const { taskId, newStatus } = body;
@@ -47,21 +43,12 @@ export async function PATCH(request: NextRequest) {
     }
 
     let prioridad = '';
-    let action_history = '';
-    let description_history = '';
-    
-    if (task.priority_task === 'low') {
-      prioridad = 'Baja';
-    }
-    if (task.priority_task === 'medium') {
-      prioridad = 'Media';
-    }
-    if (task.priority_task === 'high') {
-      prioridad = 'Alta';
-    }
+    if (task.priority === 'low') prioridad = 'Baja';
+    if (task.priority === 'medium') prioridad = 'Media';
+    if (task.priority === 'high') prioridad = 'Alta';
 
-    action_history = 'Estado cambiado';
-    description_history = `Tarea: ${task.title_task} con prioridad: ${prioridad}`;
+    const action_history = 'Estado cambiado';
+    const description_history = `Tarea: ${task.title} con prioridad: ${prioridad}`;
 
     let dateStart = null;
     let dateCompleted = null;
@@ -77,25 +64,22 @@ export async function PATCH(request: NextRequest) {
     }
 
     if (newStatus === 'done') {
-      dateStart = task.date_start_task 
-        ? (typeof task.date_start_task === 'string' && task.date_start_task.includes('T') 
-            ? toBoliviaDateTime(task.date_start_task)
-            : task.date_start_task)
+      dateStart = task.startDate
+        ? toBoliviaDateTime(task.startDate.toISOString())
         : nowBolivia();
-      
+
       dateCompleted = nowBolivia();
     }
 
-    const updateStatusTask = await TaskService.updateTaskStatus(session.id_user, user.rol_user, taskId, newStatus, dateStart, dateCompleted);
-    
+    const updateStatusTask = await TaskService.updateTaskStatus(session.id, user?.rol ?? 'user', taskId, newStatus, dateStart, dateCompleted);
+
     if (updateStatusTask) {
-      await TaskHistoryService.createTaskHistory(taskId, session.id_user, task.status_task, newStatus, action_history, description_history);
+      await TaskHistoryService.createTaskHistory(taskId, session.id, task.status ?? '', newStatus, action_history, description_history);
     }
-        
+
     const getUpdatedStatusTask = await TaskService.getTaskById(taskId);
     return NextResponse.json(getUpdatedStatusTask, { status: 200 });
-
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { message: 'Error al actualizar el estado de la tarea' },
       { status: 500 }

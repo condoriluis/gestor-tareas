@@ -1,0 +1,60 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement()) @map("id_user")
+  email     String   @unique @map("email_user")
+  password  String   @map("password_user")
+  name      String?  @map("name_user")
+  status    Int?     @default(1) @map("status_user")
+  rol       String?  @default("user") @map("rol_user")
+  createdAt DateTime @default(now()) @map("date_created_user")
+  updatedAt DateTime @updatedAt @map("date_updated_user")
+
+  tasks         Task[]
+  taskHistories TaskHistory[]
+
+  @@map("users")
+}
+
+model Task {
+  id            Int       @id @default(autoincrement()) @map("id_task")
+  userId        Int       @map("id_user_task")
+  title         String    @map("title_task")
+  description   String?   @map("description_task")
+  priority      String    @map("priority_task")
+  status        String    @default("todo") @map("status_task")
+  startDate     DateTime? @map("date_start_task")
+  completedDate DateTime? @map("date_completed_task")
+  createdAt     DateTime  @default(now()) @map("date_created_task")
+  updatedAt     DateTime  @updatedAt @map("date_updated_task")
+
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  histories TaskHistory[]
+
+  @@map("tasks")
+}
+
+model TaskHistory {
+  id          Int      @id @default(autoincrement()) @map("id_history")
+  taskId      Int      @map("id_task_history")
+  userId      Int      @map("id_user_history")
+  oldStatus   String?  @map("old_status_history")
+  newStatus   String?  @map("new_status_history")
+  action      String?  @map("action_history")
+  description String?  @map("description_history")
+  createdAt   DateTime @default(now()) @map("date_created_history")
+  updatedAt   DateTime @updatedAt @map("date_updated_history")
+
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("task_history")
+}

@@ -3,7 +3,6 @@ import { UserService } from '../UserService';
 import { rateLimit } from '@/utils/rateLimit';
 
 export async function POST(request: NextRequest) {
-  
   const limit = rateLimit(request);
   if (limit.limited) {
     return NextResponse.json(
@@ -13,18 +12,18 @@ export async function POST(request: NextRequest) {
   }
 
   const { email, password, name } = await request.json();
-  
+
   const status = 1;
   let rolUser = 'user';
   const existingAdmin = await UserService.getUserByRol('admin');
 
   if (!existingAdmin || existingAdmin.length === 0) {
-    rolUser = 'admin'; 
+    rolUser = 'admin';
   }
 
   try {
     const existingUser = await UserService.getUserByEmail(email);
-    
+
     if (existingUser) {
       return NextResponse.json(
         { error: 'El correo electrónico ya existe en el sistema.' },
@@ -32,20 +31,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if(password.trim().length < 6){
+    if (password.trim().length < 6) {
       return NextResponse.json(
         { error: 'La contraseña debe tener al menos 6 caracteres.' },
         { status: 401 }
       );
     }
-    
+
     await UserService.createUser(email, password, name, status, rolUser);
 
     return NextResponse.json(
       { message: 'Usuario registrado exitosamente.' },
       { status: 201 }
     );
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Error interno del servidor.' },
       { status: 500 }

@@ -52,25 +52,25 @@ export const ReportModal = ({ isOpen, onClose, tasks }: ReportModalProps) => {
   if (!isOpen) return null;
 
   const reportData: ChartData[] = [
-    { name: 'Por hacer', value: tasks.filter(t => t.status_task === 'todo').length, color: '#6B7280' },
-    { name: 'En progreso', value: tasks.filter(t => t.status_task === 'in_progress').length, color: '#3B82F6' },
-    { name: 'Completadas', value: tasks.filter(t => t.status_task === 'done').length, color: '#10B981' },
+    { name: 'Por hacer', value: tasks.filter(t => t.status === 'todo').length, color: '#6B7280' },
+    { name: 'En progreso', value: tasks.filter(t => t.status === 'in_progress').length, color: '#3B82F6' },
+    { name: 'Completadas', value: tasks.filter(t => t.status === 'done').length, color: '#10B981' },
   ];
 
   const priorityData = [
     {
       name: 'Baja',
-      value: tasks.filter(t => t.priority_task === 'low').length,
+      value: tasks.filter(t => t.priority === 'low').length,
       color: '#3B82F6'
     },
     {
       name: 'Media',
-      value: tasks.filter(t => t.priority_task === 'medium').length,
+      value: tasks.filter(t => t.priority === 'medium').length,
       color: '#F59E0B'
     },
     {
       name: 'Alta',
-      value: tasks.filter(t => t.priority_task === 'high').length,
+      value: tasks.filter(t => t.priority === 'high').length,
       color: '#EF4444'
     }
   ];
@@ -95,12 +95,12 @@ export const ReportModal = ({ isOpen, onClose, tasks }: ReportModalProps) => {
   };
 
   const calculateAvgCompletionTime = () => {
-    const completedTasks = tasks.filter(t => t.status_task === 'done' && t.date_start_task && t.date_completed_task);
+    const completedTasks = tasks.filter(t => t.status === 'done' && t.startDate && t.completedDate);
     if (completedTasks.length === 0) return 'N/A';
     
     const totalMs = completedTasks.reduce((sum, task) => {
-      const start = new Date(task.date_start_task).getTime();
-      const end = new Date(task.date_completed_task).getTime();
+      const start = new Date(task.startDate).getTime();
+      const end = new Date(task.completedDate).getTime();
       return sum + (end - start);
     }, 0);
     
@@ -120,14 +120,14 @@ export const ReportModal = ({ isOpen, onClose, tasks }: ReportModalProps) => {
 
   const calculateCompletionRate = () => {
     if (tasks.length === 0) return '0%';
-    return `${Math.round((tasks.filter(t => t.status_task === 'done').length / tasks.length) * 100)}%`;
+    return `${Math.round((tasks.filter(t => t.status === 'done').length / tasks.length) * 100)}%`;
   };
 
   const getMostCommonPriority = () => {
     const counts = {
-      high: tasks.filter(t => t.priority_task === 'high').length,
-      medium: tasks.filter(t => t.priority_task === 'medium').length,
-      low: tasks.filter(t => t.priority_task === 'low').length
+      high: tasks.filter(t => t.priority === 'high').length,
+      medium: tasks.filter(t => t.priority === 'medium').length,
+      low: tasks.filter(t => t.priority === 'low').length
     };
     
     const max = Math.max(...Object.values(counts));
@@ -169,7 +169,7 @@ export const ReportModal = ({ isOpen, onClose, tasks }: ReportModalProps) => {
             {[
               { 
                 label: "Tareas completadas", 
-                value: `${tasks.filter(t => t.status_task === 'done').length}/${tasks.length}`,
+                value: `${tasks.filter(t => t.status === 'done').length}/${tasks.length}`,
                 icon: MdCheckCircle,
                 color: 'text-green-500',
                 trend: 'up'

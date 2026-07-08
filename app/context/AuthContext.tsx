@@ -4,9 +4,9 @@ import { createContext, useContext, useEffect, useState, ReactNode } from 'react
 import { useRouter } from 'next/navigation';
 
 type User = {
-  id_user: number;
-  email_user: string;
-  rol_user: string;
+  id: number;
+  email: string;
+  rol: string;
 };
 
 type AuthContextType = {
@@ -29,20 +29,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const response = await fetch('/api/auth/me', {
           credentials: 'include',
         });
-        
+
         if (response.ok) {
           const userData = await response.json();
           setUser(userData);
         } else if (response.status !== 401) {
           setUser(null);
         }
-      } catch (error) {
+      } catch {
         setUser(null);
       } finally {
         setIsLoading(false);
       }
     }
-    
+
     loadUser();
   }, []);
 
@@ -63,7 +63,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } else {
         throw new Error('Login fallido.');
       }
-    } catch (error) {
+    } catch {
       throw new Error('Error al iniciar sesión');
     }
   };
@@ -74,12 +74,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         method: 'POST',
         credentials: 'include',
       });
-      
+
       if (response.ok) {
         setUser(null);
         router.push('/login');
       }
-    } catch (error) {
+    } catch {
       throw new Error('Error al cerrar sesión');
     }
   };

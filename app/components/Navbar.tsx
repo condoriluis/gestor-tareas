@@ -10,10 +10,10 @@ import UserListModal from './User/UserListModal';
 import { AboutModal } from './AboutModal';
 
 type UserType = {
-  name_user?: string;
-  email_user?: string;
-  rol_user?: string;
-  date_created_user?: string;
+  name?: string;
+  email?: string;
+  rol?: string;
+  createdAt?: string;
 };
 
 type NavbarProps = {
@@ -58,15 +58,15 @@ export default function Navbar({
         }
       }
     };
-    
+
     loadData();
   }, [user]);
 
   useEffect(() => {
     if (searchTerm.length > 0) {
-      const titles = tasks.map(t => t.title_task);
+      const titles = tasks.map(t => t.title);
       const uniqueTitles = [...new Set(titles)];
-      const filtered = uniqueTitles.filter(title => 
+      const filtered = uniqueTitles.filter(title =>
         title.toLowerCase().includes(searchTerm.toLowerCase())
       );
       setSuggestions(filtered);
@@ -123,7 +123,7 @@ export default function Navbar({
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
               {mounted && searchTerm && (
-                <button 
+                <button
                   onClick={() => {
                     setSearchTerm('');
                     setSuggestions([]);
@@ -136,7 +136,7 @@ export default function Navbar({
               {mounted && suggestions.length > 0 && (
                 <div className="absolute z-10 w-full mt-1 bg-[#2A2A2A] rounded-lg shadow-lg border border-gray-700">
                   {suggestions.map((suggestion, i) => (
-                    <div 
+                    <div
                       key={i}
                       className="px-4 py-2 hover:bg-[#343434] cursor-pointer text-white text-sm"
                       onClick={() => {
@@ -152,15 +152,15 @@ export default function Navbar({
             </div>
 
             <div className="flex items-center gap-2 sm:gap-4">
-              <button 
+              <button
                 onClick={onOpenFilterModal}
                 className="text-gray-300 hover:text-white text-sm sm:text-base transition cursor-pointer flex items-center gap-1"
               >
                 <MdFilterList size={20} />
                 <span className="hidden sm:inline">Filtros</span>
               </button>
-              
-              <button 
+
+              <button
                 onClick={onOpenReportModal}
                 className="text-gray-300 hover:text-white text-sm sm:text-base transition cursor-pointer flex items-center gap-1"
               >
@@ -168,9 +168,9 @@ export default function Navbar({
                 <span className="hidden sm:inline">Reportes</span>
               </button>
 
-              {user?.rol_user === 'admin' && <UserListModal />}
+              {user?.rol === 'admin' && <UserListModal />}
 
-              <button 
+              <button
                 onClick={() => setIsAboutModalOpen(true)}
                 className="text-gray-300 hover:text-white text-sm sm:text-base transition cursor-pointer flex items-center gap-1"
               >
@@ -194,15 +194,15 @@ export default function Navbar({
               <div className="flex items-center gap-1">
                 <div className="flex items-center gap-1">
                   <div className="relative group">
-                    <span className="text-white text-sm font-medium">{user?.name_user}</span>
+                    <span className="text-white text-sm font-medium">{user?.name}</span>
                   </div>
-                  <div 
+                  <div
                     className="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center overflow-hidden border-2 border-[#00E57B] cursor-pointer"
                     onClick={() => setIsProfileModalOpen(true)}
                   >
-                    {user?.name_user ? (
+                    {user?.name ? (
                       <span className="text-white text-sm font-medium">
-                        {user.name_user.charAt(0).toUpperCase()}
+                        {user.name.charAt(0).toUpperCase()}
                       </span>
                     ) : (
                       <span className="text-white text-sm font-medium">U</span>
@@ -215,10 +215,10 @@ export default function Navbar({
           </div>
         </div>
 
-        <ProfileUser 
-          isOpen={isProfileModalOpen} 
-          onClose={() => setIsProfileModalOpen(false)} 
-          user={user} 
+        <ProfileUser
+          isOpen={isProfileModalOpen}
+          onClose={() => setIsProfileModalOpen(false)}
+          user={user}
         />
       </nav>
     </>

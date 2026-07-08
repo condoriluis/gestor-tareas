@@ -24,7 +24,7 @@ export default function DeleteUser({
     try {
       await onConfirm();
       onClose();
-    } catch (error) {
+    } catch {
       showToast('Error al eliminar usuario', 'error');
     }
   };
@@ -34,7 +34,7 @@ export default function DeleteUser({
       <div className="bg-[#1E1E1E] border border-gray-700 rounded-xl w-full max-w-md p-6 animate-fade-in-up">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-xl font-semibold text-white">Eliminar Usuario</h3>
-          <button 
+          <button
             onClick={onClose}
             className="text-gray-400 hover:text-white"
           >
@@ -44,7 +44,7 @@ export default function DeleteUser({
 
         <div className="mb-6">
           <p className="text-gray-300">
-            ¿Estás seguro que deseas eliminar al usuario <span className="font-semibold text-white">{user.name_user}</span>?
+            ¿Estás seguro que deseas eliminar al usuario <span className="font-semibold text-white">{user.name}</span>?
           </p>
           <div className="flex items-start gap-2 mt-2 p-3 bg-red-900/20 border border-red-900/30 rounded-lg">
             <MdWarning className="text-red-400 flex-shrink-0 mt-0.5" />

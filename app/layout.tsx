@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Gestor de tareas",
-  description: "Desarrollado con Next.js, React, Typescript, Tailwind CSS, MySQL, JWT",
+  description: "Desarrollado con Next.js, React, Typescript, Tailwind CSS, PostgreSQL (Supabase), Prisma, JWT",
 };
 
 export default function RootLayout({

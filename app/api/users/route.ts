@@ -3,29 +3,32 @@ import { UserService } from '../auth/UserService';
 import { validateToken } from '@/utils/validateToken';
 
 export async function GET() {
-
-  const session = await validateToken()
+  const session = await validateToken();
 
   if (!session) {
     return NextResponse.json({ error: 'No autorizado.' }, { status: 401 })
   }
 
-  try {
+  if (session.rol !== 'admin') {
+    return NextResponse.json({ error: 'No autorizado.' }, { status: 401 })
+  }
 
+  try {
     const users = await UserService.getAllUsers();
     return NextResponse.json(users, { status: 200 });
-
-  } catch (error) {
-
+  } catch {
     return NextResponse.json({ message: 'Error al obtener usuarios' }, { status: 500 });
-
   }
 }
 
 export async function PATCH(request: NextRequest) {
-  const session = await validateToken()
+  const session = await validateToken();
 
   if (!session) {
+    return NextResponse.json({ error: 'No autorizado.' }, { status: 401 })
+  }
+
+  if (session.rol !== 'admin') {
     return NextResponse.json({ error: 'No autorizado.' }, { status: 401 })
   }
 
@@ -42,12 +45,12 @@ export async function PATCH(request: NextRequest) {
     }
 
     await UserService.updateUserStatus(idUser, status);
-    
+
     return NextResponse.json(
       { message: 'Estado actualizado correctamente.' },
       { status: 200 }
     );
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { message: 'Error al actualizar estado' },
       { status: 500 }
@@ -56,9 +59,13 @@ export async function PATCH(request: NextRequest) {
 }
 
 export async function PUT(request: NextRequest) {
-  const session = await validateToken()
+  const session = await validateToken();
 
   if (!session) {
+    return NextResponse.json({ error: 'No autorizado.' }, { status: 401 })
+  }
+
+  if (session.rol !== 'admin') {
     return NextResponse.json({ error: 'No autorizado.' }, { status: 401 })
   }
 
@@ -79,7 +86,7 @@ export async function PUT(request: NextRequest) {
       { message: 'Datos del usuario actualizados correctamente.' },
       { status: 200 }
     );
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { message: 'Error al actualizar datos del usuario.' },
       { status: 500 }
@@ -88,9 +95,13 @@ export async function PUT(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
-  const session = await validateToken()
+  const session = await validateToken();
 
   if (!session) {
+    return NextResponse.json({ error: 'No autorizado.' }, { status: 401 })
+  }
+
+  if (session.rol !== 'admin') {
     return NextResponse.json({ error: 'No autorizado.' }, { status: 401 })
   }
 
@@ -111,7 +122,7 @@ export async function DELETE(request: NextRequest) {
       { message: 'Usuario eliminado correctamente.' },
       { status: 200 }
     );
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { message: 'Error al eliminar usuario.' },
       { status: 500 }

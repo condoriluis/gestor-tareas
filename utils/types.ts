@@ -1,34 +1,34 @@
 export interface Task {
-  id_task: number;
-  id_user_task: number;
-  user_name: string;
-  title_task: string;
-  description_task: string;
-  priority_task: string;
-  status_task?: string;
-  date_start_task?: string | null;
-  date_completed_task?: string | null;
-  date_created_task?: string;
+  id: number;
+  userId: number;
+  user?: { name: string };
+  title: string;
+  description: string;
+  priority: string;
+  status?: string;
+  startDate?: string | null;
+  completedDate?: string | null;
+  createdAt?: string;
 }
 
 export interface TaskHistory {
-  id_history: number;
-  id_task_history: number;
-  id_user_history: number;
-  user_name: string;
-  old_status_history: string;
-  new_status_history: string;
-  action_history: string;
-  description_history: string;
-  date_created_history: string;
-  date_updated_history: string;
+  id: number;
+  taskId: number;
+  userId: number;
+  user?: { name: string };
+  oldStatus: string;
+  newStatus: string;
+  action: string;
+  description: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface User {
-  id_user: number;
-  name_user: string;
-  email_user: string;
-  rol_user: string;
-  status_user: number;
-  date_created_user: string;
+  id: number;
+  name: string;
+  email: string;
+  rol: string;
+  status: number;
+  createdAt: string;
 }
